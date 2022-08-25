@@ -38,7 +38,7 @@ function getUserIcon(request) {
         var board = document.getElementsByClassName("ui very basic table")[0];
         board.innerHTML += "<text>NFLSOJ helper 公告</text><hr>"
                          + "<a href='/article/1197'>NFLSOJ helper 发布帖</a><hr>"
-                         + "<text style='color:black;border:1px solid black;border-radius:4px;'>延长登录时间</text>";
+                         + "<text style='border:1px solid black;border-radius:4px;'>延长登录时间</text>";
         board.childNodes[9].addEventListener("click", function() {
             document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
             alert("Success");
@@ -52,7 +52,7 @@ function getUserIcon(request) {
         document.getElementsByClassName("header")[1].innerHTML = nameColor + " " + backup;
     } else if (/submission(?=[^s])/.test(domain)) {
         var button = document.getElementsByClassName("ui very basic table")[0];
-        button.innerHTML += "<button style='width:90px;height:28px;background:white;border:1px solid black;border-radius:4px;'>Copy</button>";
+        button.innerHTML += "<button style='width:90px;height:28px;border:1px solid black;border-radius:4px;'>Copy</button>";
         button = button.childNodes[3];
         button.addEventListener("click", function() {
             var s = document.getElementsByClassName("hl-c++")[0].textContent;
