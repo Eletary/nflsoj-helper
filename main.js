@@ -43,7 +43,7 @@ function getUserIcon(request) {
             document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
             alert("Success");
         });
-    } else if (/\/user\/[0-9]+(\/(?!edit)|[^\/])/.test(domain)) {
+    } else if (/\/user\/[0-9]+(\/(?!edit)|$)/.test(domain)) {
         var mainpage = document.getElementsByClassName("ui bottom attached segment"),
             nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML)(getColor(mainpage[3].innerHTML)),
             backup = document.getElementsByClassName("icon")[14].outerHTML, customIcon = getUserIcon(mainpage[3].innerHTML);
