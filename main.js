@@ -38,7 +38,7 @@ Array.from(document.getElementsByClassName("hl-source")).forEach(function(value)
     value = value.parentNode.parentNode.parentNode;
     value.innerHTML = "<button style='width:90px;height:28px;border:1px solid black;border-radius:4px;'>Copy</button>" + value.innerHTML;
     value.childNodes[0].addEventListener("click", function() {
-        GM_setClipboard(value.lastChild.textContent, "text");
+        GM_setClipboard(value.lastChild.textContent, "text"); // eslint-disable-line no-undef
         value.childNodes[0].textContent = "Copied!";
         setTimeout(function() {
             value.childNodes[0].textContent = "Copy";
@@ -50,7 +50,7 @@ if (domain == "/") {
         let td = document.getElementsByClassName("ui very basic center aligned table")[0].tBodies[0].childNodes[i], name = td.childNodes[3].innerText;
         td.childNodes[3].innerHTML = genColorHTML(
             "a", `href=${td.childNodes[3].childNodes[0].getAttribute("href")}`, name,
-            tourist.hasOwnProperty(name) ? tourist[name] : getColor(td.childNodes[9].textContent));
+            Object.prototype.hasOwnProperty.call(tourist, name) ? tourist[name] : getColor(td.childNodes[9].textContent));
     }
     let board = document.getElementsByClassName("ui very basic table")[0];
     board.innerHTML += `<text>NFLSOJ helper 公告</text><hr>
