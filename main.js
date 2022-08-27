@@ -25,6 +25,12 @@ function getUserIcon(request) {
 }
 (function() {
     'use strict';
+    var imageurl="https://cdn.luogu.com.cn/upload/image_hosting/t9gah1kv.png";
+    document.body.style.backgroundImage="url("+imageurl+")";
+    document.body.style.backgroundRepeat="no-repeat";
+    document.body.style.backgroundSize="cover";
+ //   alert(document.getElementsByClassName("blurring dimmable image")[0].childNodes);
+ 	//these five lines for background
     var domain = window.location.pathname;
     if (domain == "/") {
         for(var i = 1; i < 40; i += 2) {
@@ -44,6 +50,9 @@ function getUserIcon(request) {
             alert("Success");
         });
     } else if (/\/user\/[0-9]+(\/(?!edit)|$)/.test(domain)) {
+        var imageurl2="https://cdn-userpic.codeforces.com/1199019/title/4dc19a4ef4c17004.jpg";
+        document.getElementsByClassName("blurring dimmable image")[0].childNodes[3].src=imageurl2;
+ 		//these three lines for pictures
         var mainpage = document.getElementsByClassName("ui bottom attached segment"),
             nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML)(getColor(mainpage[3].innerHTML)),
             backup = document.getElementsByClassName("icon")[14].outerHTML, customIcon = getUserIcon(mainpage[3].innerHTML);
