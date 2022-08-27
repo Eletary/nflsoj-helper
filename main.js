@@ -3,10 +3,12 @@
 // @namespace    http://www.nfls.com.cn:20035/article/1197
 // @version      0.3.2
 // @description  Use NFLSOJ More Easily
-// @author       lexiyvv & ppip
+// @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match      *://www.nfls.com.cn:20035/*
 // @match      *://192.168.188.77/*
 // @grant        GM_setClipboard
+// @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
+// @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
 // ==/UserScript==
 
 function getColor(request) {
