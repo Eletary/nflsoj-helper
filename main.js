@@ -3,12 +3,10 @@
 // @namespace    http://www.nfls.com.cn:20035/article/1197
 // @version      0.3.2
 // @description  Use NFLSOJ More Easily
-// @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
+// @author       lexiyvv & ppip
 // @match      *://www.nfls.com.cn:20035/*
 // @match      *://192.168.188.77/*
 // @grant        GM_setClipboard
-// @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
-// @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
 // ==/UserScript==
 
 function getColor(request) {
@@ -34,6 +32,17 @@ if (!localStorage.getItem("fgopacity")) {
     localStorage.setItem("fgopacity", "0.8");
 }
 document.body.style.opacity = localStorage.getItem("fgopacity");
+Array.from(document.getElementsByClassName("hl-source")).forEach(function(value, index, array) {
+    value = value.parentNode.parentNode.parentNode;
+    value.innerHTML = "<button style='width:90px;height:28px;border:1px solid black;border-radius:4px;'>Copy</button>" + value.innerHTML;
+    value.childNodes[0].addEventListener("click", function() {
+        GM_setClipboard(value.lastChild.textContent, "text");
+        value.childNodes[0].textContent = "Copied!";
+        setTimeout(function() {
+            value.childNodes[0].textContent = "Copy";
+        }, 1000);
+    })
+});
 if (domain == "/") {
     for(var i = 1; i < 40; i += 2) {
         let td = document.getElementsByClassName("ui very basic center aligned table")[0].tBodies[0].childNodes[i], name = td.childNodes[3].innerText;
@@ -59,13 +68,4 @@ if (domain == "/") {
     backup = customIcon ? customIcon : /(man|woman) icon/.test(backup) ? backup : "";
     mainpage[0].innerHTML = nameColor;
     document.getElementsByClassName("header")[1].innerHTML = nameColor + " " + backup;
-} else if (/submission(?=[^s])/.test(domain)) {
-    let button = document.getElementsByClassName("ui very basic table")[0];
-    button.innerHTML += "<button style='width:90px;height:28px;border:1px solid black;border-radius:4px;'>Copy</button>";
-    button = button.childNodes[3];
-    button.addEventListener("click", function() {
-        GM_setClipboard(document.getElementsByClassName("hl-c++")[0].textContent, "text");
-        button.textContent = "Copied!";
-        setTimeout(function(){button.textContent = "Copy"}, 1000);
-    });
 }
