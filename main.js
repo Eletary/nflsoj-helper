@@ -34,7 +34,7 @@ if (!localStorage.getItem("fgopacity")) {
     localStorage.setItem("fgopacity", "0.8");
 }
 document.body.style.opacity = localStorage.getItem("fgopacity");
-Array.from(document.getElementsByClassName("hl-source")).forEach(function(value, index, array) {
+Array.from(document.getElementsByClassName("hl-source")).forEach(function(value) {
     value = value.parentNode.parentNode.parentNode;
     value.innerHTML = "<button style='width:90px;height:28px;border:1px solid black;border-radius:4px;'>Copy</button>" + value.innerHTML;
     value.childNodes[0].addEventListener("click", function() {
