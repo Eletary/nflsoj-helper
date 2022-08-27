@@ -12,7 +12,7 @@
 <p align="center">
   <a href="#"><img src="https://img.shields.io/badge/language-javascript-blue.svg"></a>
   <a href="https://github.com/NFLSCode/nflsoj-helper/releases"><img src="https://img.shields.io/badge/version-0.3.2-greeb.svg"></a>
-  <img src="https://img.shields.io/badge/founder-lexiyvv-orange.svg">
+  <a href="https://github.com/lexiyvv"><img src="https://img.shields.io/badge/founder-lexiyvv-orange.svg">
 </p>
 
 ---
