@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="#"><img src="https://img.shields.io/badge/language-javascript-blue.svg"></a>
-  <a href="https://github.com/NFLSCode/nflsoj-helper/releases"><img src="https://img.shields.io/badge/version-0.3.3-greeb.svg"></a>
+  <a href="https://github.com/NFLSCode/nflsoj-helper/releases"><img src="https://img.shields.io/badge/version-0.4.0-greeb.svg"></a>
   <a href="https://github.com/lexiyvv"><img src="https://img.shields.io/badge/founder-lexiyvv-orange.svg"></a>
 </p>
 
