@@ -10,6 +10,13 @@
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
 // ==/UserScript==
+//Init()
+{
+    //full-white-picture: https://cdn.luogu.com.cn/upload/image_hosting/qrtxpnch.png
+    var yourBackground = "https://cdn.luogu.com.cn/upload/image_hosting/qrtxpnch.png";//white
+    var yourProfilePicture = "https://cdn.luogu.com.cn/upload/image_hosting/qrtxpnch.png";//white
+    localStorage.setItem("bgurl", yourBackground);
+}
 
 function getColor(request) {
     let fir = request.match(/(?<=##)#[0-9a-fA-F]{6}/),
@@ -28,9 +35,10 @@ let tourist = {"20200131": ["black", "red"], "sszcdjr": ["black", "red"]}, domai
 if(/contests/.test(domain)){document.getElementsByClassName("padding")[0].childNodes[1].style.backgroundColor="rgba(255,255,255)";document.getElementsByClassName("padding")[0].childNodes[1].style.border="thin solid rgba(200,200,200,0.5)"}//fk IE
 else if(/submissions/.test(domain)){document.getElementsByClassName("padding")[0].childNodes[3].style.backgroundColor="rgba(255,255,255)";document.getElementsByClassName("padding")[0].childNodes[3].style.border="thin solid rgba(200,200,200,0.5)"}//fk IE
 else if(/discussion/.test(domain)){document.getElementsByClassName("padding")[0].childNodes[3].style.backgroundColor="rgba(255,255,255)";document.getElementsByClassName("padding")[0].childNodes[3].style.border="thin solid rgba(200,200,200,0.5)"}//fk IE
+else if(/cp/.test(domain)){document.getElementsByClassName("fixed-table-body")[0].style.backgroundColor="rgba(255,255,255)";document.getElementsByClassName("fixed-table-body")[0].style.border="thin solid rgba(200,200,200,0.5)"}//fk IE
 else if((/ranklist/.test(domain))&&(/contest/.test(domain))){document.getElementsByClassName("padding")[0].childNodes[3].style.backgroundColor="rgba(255,255,255)";document.getElementsByClassName("padding")[0].childNodes[3].style.border="thin solid rgba(200,200,200,0.5)"}//fk IE
 if (!localStorage.getItem("bgurl")) {
-    localStorage.setItem("bgurl", "https://cdn.luogu.com.cn/upload/image_hosting/t9gah1kv.png");
+    localStorage.setItem("bgurl", yourBackground);
 }
 document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
 document.body.style.backgroundSize="cover";
@@ -70,7 +78,7 @@ if (domain == "/") {
         alert("Success");
     });
 } else if (/\/user\/[0-9]+(\/(?!edit)|$)/.test(domain)) {
-    var imageurl2="https://cdn-userpic.codeforces.com/1199019/title/4dc19a4ef4c17004.jpg";
+    var imageurl2=yourProfilePicture;
     document.getElementsByClassName("blurring dimmable image")[0].childNodes[3].src=imageurl2;
     let mainpage = document.getElementsByClassName("ui bottom attached segment"),
         nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, getColor(mainpage[3].innerHTML)),
