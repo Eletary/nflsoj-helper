@@ -47,7 +47,7 @@ if (!localStorage.getItem("fgopacity")) {
 document.body.style.opacity = localStorage.getItem("fgopacity");
 function copy(value) {
     return function() {
-        GM_setClipboard(value.lastChild.textContent, "text");
+        GM_setClipboard(value.lastChild.textContent, "text"); // eslint-disable-line no-undef
         value.firstChild.textContent = "Copied!";
         setTimeout(function() {
             value.firstChild.textContent = "Copy";
