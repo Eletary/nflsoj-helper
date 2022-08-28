@@ -87,7 +87,7 @@ if (domain == "/") {
     }
     let board = getElement("ui very basic table")[0];
     board.innerHTML += `<text>NFLSOJ helper 公告</text><hr>
-                        <a href='/article/1197'>NFLSOJ helper 发布帖</a><hr>
+                        <a href='https://github.com/NFLSCode/nflsoj-helper/'>NFLSOJ helper 官方</a><hr>
                         <text style='border:1px solid black;border-radius:4px;'>延长登录时间</text>`;
     board.childNodes[9].addEventListener("click", function() {
         document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
