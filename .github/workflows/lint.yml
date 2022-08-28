@@ -6,9 +6,13 @@ on:
   push:
     branches:
       - master
+    paths:
+      - main.js
   pull_request:
     branches:
       - master
+    paths:
+      - main.js
 
 jobs:
   run-linters:
