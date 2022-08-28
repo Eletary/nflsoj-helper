@@ -17,7 +17,6 @@
     var yourProfilePicture = "https://cdn.luogu.com.cn/upload/image_hosting/qrtxpnch.png";//white
     localStorage.setItem("bgurl", yourBackground);
 }
-
 function getColor(request) {
     let fir = request.match(/(?<=##)#[0-9a-fA-F]{6}/),
         res = request.match(/(?<=(?<!#)#)#[0-9a-fA-F]{6}/);
@@ -79,7 +78,9 @@ if (domain == "/") {
     });
 } else if (/\/user\/[0-9]+(\/(?!edit)|$)/.test(domain)) {
     var imageurl2=yourProfilePicture;
-    document.getElementsByClassName("blurring dimmable image")[0].childNodes[3].src=imageurl2;
+    if(document.getElementsByClassName("blurring dimmable image")[0].childNodes[3]){
+        document.getElementsByClassName("blurring dimmable image")[0].childNodes[3].src=imageurl2;
+    }
     let mainpage = document.getElementsByClassName("ui bottom attached segment"),
         nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, getColor(mainpage[3].innerHTML)),
         backup = document.getElementsByClassName("icon")[14].outerHTML,
