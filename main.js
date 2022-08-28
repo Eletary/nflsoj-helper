@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NFLSOJ helper
 // @namespace    http://www.nfls.com.cn:20035/article/1197
-// @version      0.3.2
+// @version      0.3.3
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match      *://www.nfls.com.cn:20035/*
