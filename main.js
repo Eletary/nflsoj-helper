@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NFLSOJ helper
 // @namespace    http://www.nfls.com.cn:20035/article/1197
-// @version      0.3.3
+// @version      0.3.2
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match      *://www.nfls.com.cn:20035/*
@@ -25,6 +25,10 @@ function getUserIcon(request) {
     return icon ? `<i class="${icon[1]}"></i>` : null;
 }
 let tourist = {"20200131": ["black", "red"], "sszcdjr": ["black", "red"]}, domain = window.location.pathname;
+if(/contests/.test(domain)){document.getElementsByClassName("padding")[0].childNodes[1].style.backgroundColor="rgba(255,255,255)";document.getElementsByClassName("padding")[0].childNodes[1].style.border="thin solid rgba(200,200,200,0.5)"}//fk IE
+else if(/submissions/.test(domain)){document.getElementsByClassName("padding")[0].childNodes[3].style.backgroundColor="rgba(255,255,255)";document.getElementsByClassName("padding")[0].childNodes[3].style.border="thin solid rgba(200,200,200,0.5)"}//fk IE
+else if(/discussion/.test(domain)){document.getElementsByClassName("padding")[0].childNodes[3].style.backgroundColor="rgba(255,255,255)";document.getElementsByClassName("padding")[0].childNodes[3].style.border="thin solid rgba(200,200,200,0.5)"}//fk IE
+else if((/ranklist/.test(domain))&&(/contest/.test(domain))){document.getElementsByClassName("padding")[0].childNodes[3].style.backgroundColor="rgba(255,255,255)";document.getElementsByClassName("padding")[0].childNodes[3].style.border="thin solid rgba(200,200,200,0.5)"}//fk IE
 if (!localStorage.getItem("bgurl")) {
     localStorage.setItem("bgurl", "https://cdn.luogu.com.cn/upload/image_hosting/t9gah1kv.png");
 }
@@ -36,7 +40,12 @@ if (!localStorage.getItem("fgopacity")) {
 document.body.style.opacity = localStorage.getItem("fgopacity");
 Array.from(document.getElementsByClassName("hl-source")).forEach(function(value) {
     value = value.parentNode.parentNode.parentNode;
-    value.innerHTML = "<button style='width:90px;height:28px;border:1px solid black;border-radius:4px;'>Copy</button>" + value.innerHTML;
+    if(/submission/.test(domain)){
+        value.innerHTML = "<button style='width:90px;height:28px;border:1px solid black;border-radius:4px;'>Copy</button>" + value.innerHTML;
+    }
+    else{
+        value.innerHTML = '<div style = "text-align:right;">'+'Copy'+'</div>' + value.innerHTML;//why warning here qwq
+    }
     value.childNodes[0].addEventListener("click", function() {
         GM_setClipboard(value.lastChild.textContent, "text"); // eslint-disable-line no-undef
         value.childNodes[0].textContent = "Copied!";
