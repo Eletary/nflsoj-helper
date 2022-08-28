@@ -45,22 +45,29 @@ if (!localStorage.getItem("fgopacity")) {
     localStorage.setItem("fgopacity", "0.8");
 }
 document.body.style.opacity = localStorage.getItem("fgopacity");
-Array.from(document.getElementsByClassName("hl-source")).forEach(function(value) {
-    value = value.parentNode.parentNode.parentNode;
-    if(/submission/.test(domain)){
-        value.innerHTML = "<button style='width:90px;height:28px;border:1px solid black;border-radius:4px;'>Copy</button>" + value.innerHTML;
-    }
-    else{
-        value.innerHTML = '<div style = "text-align:right;">'+'Copy'+'</div>' + value.innerHTML;//why warning here qwq
-    }
-    value.childNodes[0].addEventListener("click", function() {
-        GM_setClipboard(value.lastChild.textContent, "text"); // eslint-disable-line no-undef
-        value.childNodes[0].textContent = "Copied!";
+function copy(value) {
+    return function() {
+        GM_setClipboard(value.lastChild.textContent, "text");
+        value.firstChild.textContent = "Copied!";
         setTimeout(function() {
-            value.childNodes[0].textContent = "Copy";
+            value.firstChild.textContent = "Copy";
         }, 1000);
-    })
-});
+    }
+}
+if (/^\/submission\/\d+$/.test(domain)) {
+    let value = document.getElementsByClassName("ui existing segment")[0];
+    value.firstChild.style.borderRadius = "0 0.28571429rem 0 0";
+    value.firstChild.style.position = "unset";
+    let position = value.innerHTML.search(/<\/a>/) + 4;
+    value.innerHTML = `<span style="position:absolute;top:0px;right:-4px;"><div class="ui button" style="position:relative;left:4px;border-right: 1px solid rgba(0,0,0,0.6);border-radius: 0 0 0 .28571429rem;">Copy</div>${value.innerHTML.slice(0, position)}</span>${value.innerHTML.slice(position)}`;
+    value.firstChild.firstChild.addEventListener("click", copy(value));
+} else {
+    Array.from(document.getElementsByClassName("hl-source")).forEach(function(value) {
+        value = value.parentNode.parentNode.parentNode;
+        value.innerHTML = `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">Copy</div>` + value.innerHTML;
+        value.firstChild.addEventListener("click", copy(value));
+    });
+}
 if (domain == "/") {
     for(var i = 1; i < 40; i += 2) {
         let td = document.getElementsByClassName("ui very basic center aligned table")[0].tBodies[0].childNodes[i], name = td.childNodes[3].innerText;
