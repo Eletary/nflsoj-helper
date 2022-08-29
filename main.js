@@ -114,6 +114,9 @@ if (domain == "/") {
         <a class="ui button" style="position:relative;left:20px;" href='https://github.com/NFLSCode/nflsoj-helper/'>
             转到 NFLSOJ Helper 官方主页
         </a>
+        <a class="ui button" style="position:relative;left:20px;" href="https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/main.js">
+            源码
+        </a>
         </td>
         </tr>
         <tr>
