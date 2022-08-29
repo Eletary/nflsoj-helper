@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NFLSOJ helper
 // @namespace    https://github.com/NFLSCode/nflsoj-helper
-// @version      0.4.1
+// @version      0.4.2
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match        *://www.nfls.com.cn:20035/*
@@ -56,7 +56,7 @@ if (!(/login/.test(domain))) {
                                Copy
                              </div>${value.innerHTML.slice(0, position)}
                            </span>${value.innerHTML.slice(position)}`;
-        addCopy(value.firstChild.firstChild, value.lastChild);
+        addCopy(value.firstChild.childNodes[1], value.lastChild);
     } else {
         for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
             if (/\/problem\//.test(domain)) {
