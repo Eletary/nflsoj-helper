@@ -45,6 +45,18 @@ function addCopy(button, code) {
         }, 1000);
     })
 }
+var clickCountForCode = 0;
+function formatCode() {
+    clickCountForCode+=1;
+    let value = getElement("ui existing segment")[0];
+    if(clickCountForCode%2===1){
+        document.getElementsByClassName("ui existing segment")[0].childNodes[4].firstChild.innerHTML=formattedCode;
+        value.childNodes[0].childNodes[2].textContent = "显示原始代码";
+    }else{
+        document.getElementsByClassName("ui existing segment")[0].childNodes[4].firstChild.innerHTML=unformattedCode;
+        value.childNodes[0].childNodes[2].textContent = "格式化代码";
+    }
+}
 if (!(/login/.test(domain))) {
     if (/^\/submission\/\d+(\/|$)/.test(domain)) {
         let value = getElement("ui existing segment")[0];
@@ -57,6 +69,7 @@ if (!(/login/.test(domain))) {
                              </div>${value.innerHTML.slice(0, position)}
                            </span>${value.innerHTML.slice(position)}`;
         addCopy(value.firstChild.childNodes[1], value.lastChild);
+        value.childNodes[0].childNodes[2].addEventListener("click", formatCode);
     } else {
         for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
             if (/\/problem\//.test(domain)) {
