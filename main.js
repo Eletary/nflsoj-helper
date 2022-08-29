@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         NFLSOJ helper
+// @name         NFLSOJ Helper
 // @namespace    https://github.com/NFLSCode/nflsoj-helper
 // @version      0.5.0
 // @description  Use NFLSOJ More Easily
