@@ -45,8 +45,7 @@ function addCopy(button, code) {
         }, 1000);
     })
 }
-if(!(/login/.test(domain)))
-{
+if (!(/login/.test(domain))) {
     if (/^\/submission\/\d+(\/|$)/.test(domain)) {
         let value = getElement("ui existing segment")[0];
         value.firstChild.style.borderRadius = "0 0.28571429rem 0 0";
