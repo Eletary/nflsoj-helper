@@ -104,7 +104,7 @@ if (domain == "/") {
             Object.prototype.hasOwnProperty.call(tourist, name) ? tourist[name] : getColor(td.childNodes[9].textContent));
     }
     let col = document.getElementsByClassName("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
-    col.innerHTML = col.innerHTML.slice(0, ind) + `
+    col.innerHTML = `${col.innerHTML.slice(0, ind)}
     <h4 class="ui top attached block header"><img src="https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png" style="width:1.18em;height:1em;" />NFLSOJ Helper控制台</h4>
     <div class="ui bottom attached segment">
         官网链接：
@@ -115,7 +115,8 @@ if (domain == "/") {
         主要功能：
         <span class="ui button" style="position:relative;left:0px;" id="aaa">延长登录时间</span>
         <span class="ui button" style="position:relative;left:0px;" id="bbb">更换背景</span>
-    </div>` + col.innerHTML.slice(ind);
+    </div>
+    ${col.innerHTML.slice(ind)}`;
     document.getElementById("aaa").addEventListener("click", function() {
         document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
         alert("Success");
@@ -126,6 +127,52 @@ if (domain == "/") {
         alert("Success");
         document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
     });
+    document.getElementsByTagName("ul")[0].innerHTML = `
+    <li><a href="http://www.51nod.com">51Nod</a></li>
+    <li><a href="http://acdream.info">ACdream</a></li>
+    <li><a href="http://judge.u-aizu.ac.jp">Aizu</a></li>
+    <li><a href="https://atcoder.jp">AtCoder</a></li>
+    <li><a href="https://www.acmicpc.net">Baekjoon</a></li>
+    <li><a href="http://codeforces.com/gyms/">CF::Gym</a></li>
+    <li><a href="http://www.codechef.com">CodeChef</a></li>
+    <li><a href="http://codeforces.com">CodeForces</a></li>
+    <li><a href="https://cses.fi/problemset">CSEG</a></li>
+    <li><a href="https://cpc.csgrandeur.cn">CSG</a></li>
+    <li><a href="http://acm.csu.cn/OnlineJudge">CSU</a></li>
+    <li><a href="https://dmoj.ca">DMOJ</a></li>
+    <li><a href="https://www.e-olymp.com/en/">E-Olymp</a></li>
+    <li><a href="http://acm.mipt.ru/judge/">EIJudge</a></li>
+    <li><a href="http://acm.fzu.edu.cn">FZU</a></li>
+    <li><a href="https://florr.io">FlorrIO</a></li>
+    <li><a href="https://www.hackerrank.com">HackerRank</a></li>
+    <li><a href="http://acm.hdu.edu.cn">HDU</a></li>
+    <li><a href="https://darkbzoj.cc">黑暗爆炸</a></li>
+    <li><a href="https://hihocoder.com">HihoCoder</a></li>
+    <li><a href="http://acm.hit.edu.cn/hoj/">HIT</a></li>
+    <li><a href="http://acm.hrbust.edu.cn">HRBUST</a></li>
+    <li><a href="http://www.hustoj.org">HUST</a></li>
+    <li><a href="http://www.lydsy.com/JudgeOnline/">HYSBZ</a></li>
+    <li><a href="https://nanti.jisuanke.com">计蒜客</a></li>
+    <li><a href="https://open.kattis.com">Kattis</a></li>
+    <li><a href="https://loj.ac">LibreOJ</a></li>
+    <li><a href="http://lightoj.com">LightOJ</a></li>
+    <li><a href="https://luogu.com.cn/">洛谷</a></li>
+    <li><a href="https://ac.2333.moe">NBUT</a></li>
+    <li><a href="http://openjudge.cn">OpenJudge</a></li>
+    <li><a href="http://qoj.ac">QOJ</a></li>
+    <li><a href="http://cstests.scu.edu.cn">SCU</a></li>
+    <li><a href="https://codeforces.com/problemsets/acmsguru/">SGU</a></li>
+    <li><a href="http://www.spoj.com">SPOJ</a></li>
+    <li><a href="https://arena.topcoder.com">TopCoder</a></li>
+    <li><a href="https://toph.co">Toph</a></li>
+    <li><a href="https://github.com/HeRaNO/cdoj-vjudge/wiki">UESTC</a></li>
+    <li><a href="https://uoj.ac">UniversalOJ</a></li>
+    <li><a href="http://acm.timus.ru">URAL</a></li>
+    <li><a href="https://onlinejudge.org/">UVA</a></li>
+    <li><a href="http://livearchive.onlinejudge.org/index.php">UVALive</a></li>
+    <li><a href="http://www.codah.club">Z-Trening</a></li>
+    <li><a href="http://acm.zju.edu.cn/onlinejudge/">ZOJ</a></li>
+    `;
 } else if (/^\/user\/\d+(\/|$)/.test(domain)) {
     let imageurl = yourProfilePicture, imgPath = getElement("blurring dimmable image")[0].childNodes[3];
     if (imgPath) {
