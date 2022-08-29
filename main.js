@@ -8,9 +8,7 @@
 // @match        *://192.168.188.77/*
 // @grant        GM_setClipboard
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
-// @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png'
-// @updateURL    https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/main.js
-// @downloadURL  https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/main.js
+// @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
 // ==/UserScript==
 
 var yourProfilePicture = "https://cdn.luogu.com.cn/upload/usericon/150522.png"; // white
