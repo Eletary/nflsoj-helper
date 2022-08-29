@@ -45,26 +45,29 @@ function addCopy(button, code) {
         }, 1000);
     })
 }
-if (/^\/submission\/\d+(\/|$)/.test(domain)) {
-    let value = getElement("ui existing segment")[0];
-    value.firstChild.style.borderRadius = "0 0.28571429rem 0 0";
-    value.firstChild.style.position = "unset";
-    let position = value.innerHTML.search(/<\/a>/) + 4;
-    value.innerHTML = `<span style="position:absolute;top:0px;right:-4px;">
+if(!(/login/.test(domain)))
+{
+    if (/^\/submission\/\d+(\/|$)/.test(domain)) {
+        let value = getElement("ui existing segment")[0];
+        value.firstChild.style.borderRadius = "0 0.28571429rem 0 0";
+        value.firstChild.style.position = "unset";
+        let position = value.innerHTML.search(/<\/a>/) + 4;
+        value.innerHTML = `<span style="position:absolute;top:0px;right:-4px;">
                          <div class="ui button" style="position:relative;left:4px;border-right: 1px solid rgba(0,0,0,0.6);border-radius: 0 0 0 .28571429rem;">
                            Copy
                          </div>${value.innerHTML.slice(0, position)}
                        </span>${value.innerHTML.slice(position)}`;
-    addCopy(value.firstChild.firstChild, value.lastChild);
-} else {
-    for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
-        if (/\/problem\//.test(domain)) {
-            e[i].parentNode.style.width = "50%";
-        }
-        e[i].innerHTML = `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
+        addCopy(value.firstChild.firstChild, value.lastChild);
+    } else {
+        for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
+            if (/\/problem\//.test(domain)) {
+                e[i].parentNode.style.width = "50%";
+            }
+            e[i].innerHTML = `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
                             Copy
                           </div>${e[i].innerHTML}`;
-        addCopy(e[i].firstChild, e[i].childNodes[e[i].childNodes.length / 2]);
+            addCopy(e[i].firstChild, e[i].childNodes[e[i].childNodes.length / 2]);
+        }
     }
 }
 function getColor(request) {
@@ -89,15 +92,15 @@ if (domain == "/") {
             Object.prototype.hasOwnProperty.call(tourist, name) ? tourist[name] : getColor(td.childNodes[9].textContent));
     }
     let board = getElement("ui very basic table")[0];
-    board.innerHTML += `<text>NFLSOJ helper 公告</text><hr>
-                        <a href='https://github.com/NFLSCode/nflsoj-helper/'>NFLSOJ helper 官方</a><hr>
-                        <text style='border:1px solid black;border-radius:4px;'>延长登录时间</text>
-                        <text style='border:1px solid black;border-radius:4px;'>更换背景</text>`;
-    board.childNodes[11].addEventListener("click", function() {
+    board.innerHTML += `<h4>NFLSOJ Helper 公告</h4><hr>
+                        <a href='https://github.com/NFLSCode/nflsoj-helper/'><div class="ui button" style="position:relative;left:0px;"> 转到 NFLSOJ helper 官方主页 </div></a>
+                        <div class="ui button" style="position:relative;left:0px;">延长登录时间</div>
+                        <div class="ui button" style="position:relative;left:0px;">更换背景</div>`;
+    board.childNodes[10].addEventListener("click", function() {
         document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
         alert("Success");
     });
-    board.childNodes[13].addEventListener("click", function() {
+    board.childNodes[12].addEventListener("click", function() {
         localStorage.setItem("bgurl", prompt("请输入背景链接，想取消设置背景输入null，默认图片由GlaceonVGC提供",
                                              "https://raw.githubusercontent.com/LazoCoder/Pokemon-Terminal/master/pokemonterminal/Images/Generation%20IV%20-%20Sinnoh/471.jpg"));
         alert("Success");
