@@ -8,7 +8,9 @@
 // @match        *://192.168.188.77/*
 // @grant        GM_setClipboard
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
-// @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
+// @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png'
+// @updateURL    https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/main.js
+// @downloadURL  https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/main.js
 // ==/UserScript==
 
 var yourProfilePicture = "https://cdn.luogu.com.cn/upload/usericon/150522.png"; // white
@@ -105,16 +107,25 @@ if (domain == "/") {
     }
     let col = document.getElementsByClassName("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
     col.innerHTML = col.innerHTML.slice(0, ind) + `
-    <h4 class="ui top attached block header"><img src="https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png" style="width:20px;height:20px;">NFLSOJ Helper控制台</h4>
+    <h4 class="ui top attached block header"><img src="https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png" style="width:20px;height:20px;">NFLSOJ Helper控制面板</h4>
     <div class="ui bottom attached segment">
-        官网链接：
-        <a class="ui button" style="position:relative;left:0px;" href='https://github.com/NFLSCode/nflsoj-helper/'>
+        <table class="ui very basic table" style="table-layout: fixed; ">
+        <tr>
+        <td>
+        <h4 text>官网链接</text>
+        <a class="ui button" style="position:relative;left:20px;" href='https://github.com/NFLSCode/nflsoj-helper/'>
             转到 NFLSOJ Helper 官方主页
         </a>
-        <hr />
-        主要功能：
-        <span class="ui button" style="position:relative;left:0px;" id="aaa">延长登录时间</span>
-        <span class="ui button" style="position:relative;left:0px;" id="bbb">更换背景</span>
+        </td>
+        </tr>
+        <tr>
+        <td>
+        <h4 text>主要功能</text>
+        <span class="ui button" style="position:relative;left:20px;" id="aaa">延长登录时间</span>
+        <span class="ui button" style="position:relative;left:20px;" id="bbb">更换背景</span>
+        </td>
+        </tr>
+        </table>
     </div>` + col.innerHTML.slice(ind);
     document.getElementById("aaa").addEventListener("click", function() {
         document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
