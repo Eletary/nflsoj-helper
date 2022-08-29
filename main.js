@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NFLSOJ helper
 // @namespace    https://github.com/NFLSCode/nflsoj-helper
-// @version      0.4.2
+// @version      0.5.0
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match        *://www.nfls.com.cn:20035/*
@@ -31,7 +31,7 @@ if (/contests/.test(domain)) {
 if (localStorage.getItem("bgurl") && localStorage.getItem("bgurl") != "null") {
     document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
 }
-document.body.style.backgroundSize="cover";
+document.body.style.backgroundSize = "cover";
 if (!localStorage.getItem("fgopacity")) {
     localStorage.setItem("fgopacity", "0.8");
 }
@@ -47,13 +47,13 @@ function addCopy(button, code) {
 }
 var clickCountForCode = 0;
 function formatCode() {
-    clickCountForCode+=1;
+    clickCountForCode += 1;
     let value = getElement("ui existing segment")[0];
-    if(clickCountForCode%2===1){
-        document.getElementsByClassName("ui existing segment")[0].childNodes[4].firstChild.innerHTML=formattedCode;  // eslint-disable-line no-undef
+    if (clickCountForCode % 2 === 1) {
+        document.getElementsByClassName("ui existing segment")[0].childNodes[4].firstChild.innerHTML = formattedCode;  // eslint-disable-line no-undef
         value.childNodes[0].childNodes[2].textContent = "显示原始代码";
-    }else{
-        document.getElementsByClassName("ui existing segment")[0].childNodes[4].firstChild.innerHTML=unformattedCode;  // eslint-disable-line no-undef
+    } else {
+        document.getElementsByClassName("ui existing segment")[0].childNodes[4].firstChild.innerHTML = unformattedCode;  // eslint-disable-line no-undef
         value.childNodes[0].childNodes[2].textContent = "格式化代码";
     }
 }
@@ -124,7 +124,7 @@ if (domain == "/") {
         localStorage.setItem("bgurl", prompt("请输入背景链接，想删除背景选择“取消”，默认图片由GlaceonVGC提供",
                                              "https://raw.githubusercontent.com/LazoCoder/Pokemon-Terminal/master/pokemonterminal/Images/Generation%20IV%20-%20Sinnoh/471.jpg"));
         alert("Success");
-        document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
+        document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
     });
 } else if (/^\/user\/\d+(\/|$)/.test(domain)) {
     let imageurl = yourProfilePicture, imgPath = getElement("blurring dimmable image")[0].childNodes[3];
