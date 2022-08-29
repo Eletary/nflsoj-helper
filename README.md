@@ -17,4 +17,6 @@
 
 ---
 
-Nothing here. Go and finish the feature requests.
+## How to use it
+
+Just add script [`main.js`](main.js) into your tampermonkey.
