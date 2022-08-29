@@ -28,7 +28,7 @@ if (/contests/.test(domain)) {
 } else if (/cp/.test(domain)) {
     betterBorder(getElement("fixed-table-body")[0]);
 }
-if (localStorage.getItem("bgurl") && localStorage.getItem("bgurl") != "null") {
+if (localStorage.getItem("bgurl")) {
     document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
 }
 document.body.style.backgroundSize = "cover";
@@ -50,10 +50,10 @@ function formatCode() {
     clickCountForCode += 1;
     let value = getElement("ui existing segment")[0];
     if (clickCountForCode % 2 === 1) {
-        document.getElementsByClassName("ui existing segment")[0].childNodes[4].firstChild.innerHTML = formattedCode;  // eslint-disable-line no-undef
+        document.getElementsByClassName("ui existing segment")[0].childNodes[4].firstChild.innerHTML = formattedCode; // eslint-disable-line no-undef
         value.childNodes[0].childNodes[2].textContent = "显示原始代码";
     } else {
-        document.getElementsByClassName("ui existing segment")[0].childNodes[4].firstChild.innerHTML = unformattedCode;  // eslint-disable-line no-undef
+        document.getElementsByClassName("ui existing segment")[0].childNodes[4].firstChild.innerHTML = unformattedCode; // eslint-disable-line no-undef
         value.childNodes[0].childNodes[2].textContent = "格式化代码";
     }
 }
