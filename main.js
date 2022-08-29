@@ -53,10 +53,10 @@ if(!(/login/.test(domain)))
         value.firstChild.style.position = "unset";
         let position = value.innerHTML.search(/<\/a>/) + 4;
         value.innerHTML = `<span style="position:absolute;top:0px;right:-4px;">
-                         <div class="ui button" style="position:relative;left:4px;border-right: 1px solid rgba(0,0,0,0.6);border-radius: 0 0 0 .28571429rem;">
-                           Copy
-                         </div>${value.innerHTML.slice(0, position)}
-                       </span>${value.innerHTML.slice(position)}`;
+                             <div class="ui button" style="position:relative;left:4px;border-right: 1px solid rgba(0,0,0,0.6);border-radius: 0 0 0 .28571429rem;">
+                               Copy
+                             </div>${value.innerHTML.slice(0, position)}
+                           </span>${value.innerHTML.slice(position)}`;
         addCopy(value.firstChild.firstChild, value.lastChild);
     } else {
         for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
@@ -64,8 +64,8 @@ if(!(/login/.test(domain)))
                 e[i].parentNode.style.width = "50%";
             }
             e[i].innerHTML = `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
-                            Copy
-                          </div>${e[i].innerHTML}`;
+                                Copy
+                              </div>${e[i].innerHTML}`;
             addCopy(e[i].firstChild, e[i].childNodes[e[i].childNodes.length / 2]);
         }
     }
@@ -101,7 +101,7 @@ if (domain == "/") {
         alert("Success");
     });
     board.childNodes[12].addEventListener("click", function() {
-        localStorage.setItem("bgurl", prompt("请输入背景链接，想取消设置背景输入null，默认图片由GlaceonVGC提供",
+        localStorage.setItem("bgurl", prompt("请输入背景链接，想删除背景输入null，默认图片由GlaceonVGC提供",
                                              "https://raw.githubusercontent.com/LazoCoder/Pokemon-Terminal/master/pokemonterminal/Images/Generation%20IV%20-%20Sinnoh/471.jpg"));
         alert("Success");
         window.location.reload();
