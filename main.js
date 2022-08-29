@@ -105,7 +105,7 @@ if (domain == "/") {
     }
     let col = document.getElementsByClassName("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
     col.innerHTML = col.innerHTML.slice(0, ind) + `
-    <h4 class="ui top attached block header"><img src="https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png" style="width:1.18em;height:1em;" />NFLSOJ Helper控制台</h4>
+    <h4 class="ui top attached block header"><img src="https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png" style="width:20px;height:20px;">NFLSOJ Helper控制台</h4>
     <div class="ui bottom attached segment">
         官网链接：
         <a class="ui button" style="position:relative;left:0px;" href='https://github.com/NFLSCode/nflsoj-helper/'>
