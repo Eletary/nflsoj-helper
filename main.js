@@ -103,20 +103,28 @@ if (domain == "/") {
             "a", `href=${td.childNodes[3].childNodes[0].getAttribute("href")}`, name,
             Object.prototype.hasOwnProperty.call(tourist, name) ? tourist[name] : getColor(td.childNodes[9].textContent));
     }
-    let board = getElement("ui very basic table")[0];
-    board.innerHTML += `<h4>NFLSOJ Helper 公告</h4><hr>
-                        <a href='https://github.com/NFLSCode/nflsoj-helper/'><div class="ui button" style="position:relative;left:0px;"> 转到 NFLSOJ helper 官方主页 </div></a>
-                        <div class="ui button" style="position:relative;left:0px;">延长登录时间</div>
-                        <div class="ui button" style="position:relative;left:0px;">更换背景</div>`;
-    board.childNodes[10].addEventListener("click", function() {
+    let col = document.getElementsByClassName("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
+    col.innerHTML = col.innerHTML.slice(0, ind) + `
+    <h4 class="ui top attached block header"><img src="https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png" style="width:1.18em;height:1em;" />NFLSOJ Helper控制台</h4>
+    <div class="ui bottom attached segment">
+        官网链接：
+        <a class="ui button" style="position:relative;left:0px;" href='https://github.com/NFLSCode/nflsoj-helper/'>
+            转到 NFLSOJ Helper 官方主页
+        </a>
+        <hr />
+        主要功能：
+        <span class="ui button" style="position:relative;left:0px;" id="aaa">延长登录时间</span>
+        <span class="ui button" style="position:relative;left:0px;" id="bbb">更换背景</span>
+    </div>` + col.innerHTML.slice(ind);
+    document.getElementById("aaa").addEventListener("click", function() {
         document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
         alert("Success");
     });
-    board.childNodes[12].addEventListener("click", function() {
-        localStorage.setItem("bgurl", prompt("请输入背景链接，想删除背景输入null，默认图片由GlaceonVGC提供",
+    document.getElementById("bbb").addEventListener("click", function() {
+        localStorage.setItem("bgurl", prompt("请输入背景链接，想删除背景选择“取消”，默认图片由GlaceonVGC提供",
                                              "https://raw.githubusercontent.com/LazoCoder/Pokemon-Terminal/master/pokemonterminal/Images/Generation%20IV%20-%20Sinnoh/471.jpg"));
         alert("Success");
-        window.location.reload();
+        document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
     });
 } else if (/^\/user\/\d+(\/|$)/.test(domain)) {
     let imageurl = yourProfilePicture, imgPath = getElement("blurring dimmable image")[0].childNodes[3];
