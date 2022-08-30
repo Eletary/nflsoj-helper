@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NFLSOJ Helper
 // @namespace    https://github.com/NFLSCode/nflsoj-helper
-// @version      0.6.0
+// @version      0.6.1
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match        *://www.nfls.com.cn:20035/*
@@ -31,9 +31,9 @@ function betterBorder(p) {
     p.style.padding = "14px";
     p.style.border = "thin solid rgba(200,200,200,0.5)";
 }
-if (/contests/.test(domain)) {
+if (/contests|practices/.test(domain)) {
     betterBorder(getElement("padding")[0].childNodes[1]);
-} else if (/submissions|discussion|(contest\/\d+\/(ranklist|repeat))/.test(domain)) {
+} else if (/submissions|discussion|ranklist|repeat/.test(domain)) {
     betterBorder(getElement("padding")[0].childNodes[3]);
 } else if (/cp/.test(domain)) {
     betterBorder(getElement("fixed-table-body")[0]);
