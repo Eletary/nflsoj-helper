@@ -1,16 +1,30 @@
 // ==UserScript==
 // @name         NFLSOJ Helper
 // @namespace    https://github.com/NFLSCode/nflsoj-helper
-// @version      0.5.0
+// @version      0.5.1
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match        *://www.nfls.com.cn:20035/*
 // @match        *://192.168.188.77/*
+// @require     http://www.nfls.com.cn:20035/cdnjs/jquery/3.3.1/jquery.min.js
 // @grant        GM_setClipboard
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon.png
 // ==/UserScript==
 
+let repo = "NFLSCode/nflsoj-helper";
+function GET(url) {
+    var result;
+    $.ajax({ // eslint-disable-line no-undef
+        async: false,
+        type: "GET",
+        url: url,
+        success: function (msg) {
+            result = msg;
+        }
+    });
+    return result;
+}
 var yourProfilePicture = "https://cdn.luogu.com.cn/upload/usericon/150522.png"; // white
 function getElement(request) {
     return document.getElementsByClassName(request);
@@ -114,8 +128,8 @@ if (domain == "/") {
         <a class="ui button" style="position:relative;left:20px;" href='https://github.com/NFLSCode/nflsoj-helper/'>
             转到 NFLSOJ Helper 官方主页
         </a>
-        <a class="ui button" style="position:relative;left:20px;" href="https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/main.js">
-            源码
+        <a class="ui button" style="position:relative;left:20px;" href="https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases`)[0].tag_name}/nflsoj-helper.min.user.js">
+            获取最新版
         </a>
         </td>
         </tr>
