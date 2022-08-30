@@ -125,11 +125,11 @@ if (domain == "/") {
         <tr>
         <td>
         <h4 text>官网链接</text>
-        <a class="ui button" style="position:relative;left:20px;" href='https://github.com/NFLSCode/nflsoj-helper/'>
-            转到 NFLSOJ Helper 官方主页
+        <a class="ui blue button" style="position:relative;left:20px;" href='https://github.com/NFLSCode/nflsoj-helper/'>
+            <i class="ui linkify icon"></i><text style="position:relative;left:0px;">转到 NFLSOJ Helper 官方主页</text>
         </a>
-        <a class="ui button" style="position:relative;left:20px;" href="https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases`)[0].tag_name}/nflsoj-helper.min.user.js">
-            获取最新版
+        <a class="ui green button" style="position:relative;left:20px;" href="https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases`)[0].tag_name}/nflsoj-helper.min.user.js">
+            <i class="repeat icon"></i><text style="position:relative;left:0px;">获取最新版</text>
         </a>
         </td>
         </tr>
