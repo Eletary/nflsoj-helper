@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         NFLSOJ Helper
 // @namespace    https://github.com/NFLSCode/nflsoj-helper
-// @version      0.5.2
+// @version      0.6.0
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match        *://www.nfls.com.cn:20035/*
 // @match        *://192.168.188.77/*
-// @require     http://www.nfls.com.cn:20035/cdnjs/jquery/3.3.1/jquery.min.js
+// @require      http://www.nfls.com.cn:20035/cdnjs/jquery/3.3.1/jquery.min.js
 // @grant        GM_setClipboard
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
@@ -17,6 +17,10 @@ function GET(url) {
     var result;
     $.ajax({async: false, type: "GET", url: url, success: function(msg){result = msg;}}); // eslint-disable-line no-undef
     return result;
+}
+function getDiscuss(href) {
+    let doc = new DOMParser().parseFromString(GET(href), "text/html");
+    return doc.getElementById("content");
 }
 function getElement(request) {
     return document.getElementsByClassName(request);
@@ -38,9 +42,7 @@ if (localStorage.getItem("bgurl")) {
     document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
 }
 document.body.style.backgroundSize = "cover";
-if (!localStorage.getItem("fgopacity")) {
-    localStorage.setItem("fgopacity", "0.8");
-}
+if (!localStorage.getItem("fgopacity")) localStorage.setItem("fgopacity", "0.8");
 document.body.style.opacity = localStorage.getItem("fgopacity");
 // copy module
 function addCopy(button, code) {
@@ -72,12 +74,15 @@ if (!(/login/.test(domain))) {
         value.childNodes[0].childNodes[2].addEventListener("click", formatCode);
     } else {
         for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
-            if (/\/problem\//.test(domain)) {
-                e[i].parentNode.style.width = "50%";
-            }
             e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
                                  Copy</div>`;
-            addCopy(e[i].firstChild, e[i].childNodes[e[i].childNodes.length / 2]);
+            if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
+            else if (e[i].firstChild.localName != "pre") {
+                var href = domain.match(/\/article\/\d+/)[0];
+                if (href) addCopy(e[i].lastChild, getDiscuss(window.location.origin + href + "/edit"));
+                continue;
+            }
+            addCopy(e[i].lastChild, e[i].childNodes[0]);
         }
     }
 }
@@ -97,9 +102,7 @@ function getUserIcon(request) {
 }
 if (/^\/user\/\d+(\/|$)/.test(domain)) {
     let imageurl = yourProfilePicture, imgPath = getElement("blurring dimmable image")[0].childNodes[3];
-    if (imgPath) {
-        imgPath.src=imageurl;
-    }
+    if (imgPath) imgPath.src=imageurl;
     let mainpage = getElement("ui bottom attached segment"),
         nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, getColor(mainpage[3].innerHTML)),
         backup = getElement("icon")[14].outerHTML, customIcon = getUserIcon(mainpage[3].innerHTML);
@@ -132,7 +135,7 @@ if (domain == "/") {
         <span class="ui button" style="position:relative;left:20px;" id="f2">更换背景</span>
         </td></tr></table></div>` + col.innerHTML.slice(ind);
     document.getElementById("l1").addEventListener("click", function() {
-        window.location.href = `https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases`)[0].tag_name}/nflsoj-helper.min.user.js`;
+        window.location.href = `https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name}/nflsoj-helper.min.user.js`;
     });
     document.getElementById("f1").addEventListener("click", function() {
         document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
