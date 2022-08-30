@@ -12,7 +12,7 @@
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // ==/UserScript==
 
-let domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", yourProfilePicture = "https://cdn.luogu.com.cn/upload/usericon/150522.png";
+let domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", yourProfilePicture = "https://cdn.luogu.com.cn/upload/usericon/150522.png"; // white
 function GET(url) {
     var result;
     $.ajax({async: false, type: "GET", url: url, success: function(msg){result = msg;}}); // eslint-disable-line no-undef
@@ -60,11 +60,11 @@ function formatCode() {
 if (!(/login/.test(domain))) {
     if (/^\/submission\/\d+(\/|$)/.test(domain)) {
         let value = getElement("ui existing segment")[0];
-        value.firstChild.style.borderRadius = "0 0.28571429rem 0 0";
+        value.firstChild.style.borderRadius = "0 .28571429rem 0 0";
         value.firstChild.style.position = "unset";
         let position = value.innerHTML.search(/<\/a>/) + 4;
         value.innerHTML = `<span style="position:absolute;top:0px;right:-4px;">
-                             <div class="ui button" style="position:relative;left:4px;border-right:1px solid rgba(0,0,0,0.6);border-radius:0 0 0.28571429rem;">
+                             <div class="ui button" style="position:relative;left:4px;border-right:1px solid rgba(0,0,0,0.6);border-radius:0 0 0 .28571429rem;">
                                Copy
                              </div>${value.innerHTML.slice(0, position)}
                            </span>${value.innerHTML.slice(position)}`;
@@ -114,7 +114,7 @@ if (/^\/user\/\d+(\/|$)/.test(domain)) {
             Object.prototype.hasOwnProperty.call(tourist, name) ? tourist[name] : getColor(td.childNodes[9].textContent));
     }
 }
-// dashbourd
+// dashboard
 if (domain == "/") {
     let col = document.getElementsByClassName("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
     col.innerHTML = col.innerHTML.slice(0, ind) + `
