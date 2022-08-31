@@ -1,7 +1,7 @@
 import os
 import re
 with open("temp") as f:
-    m = f.readline()[1:]
+    m = f.readline()[12:]
 with open("main.js", "r", encoding = "iso8859-2") as f:
     file = f.read()
 mac = re.search("(// @version +)[^\n]+\n", file)
