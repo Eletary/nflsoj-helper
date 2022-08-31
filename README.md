@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="#">
-    <img alt="NFLSOJ helper" src="https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/icon1024.png" width="128">
+    <img alt="NFLSOJ helper" src="https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon1024.png" width="128">
   </a>
 </p>
 <p align="center" style="font-size:1000;">
