@@ -1,9 +1,7 @@
 import os
 import re
-os.system("git describe > temp")
 with open("temp") as f:
-    m = f.readline()[1:-1]
-os.remove("temp")
+    m = f.readline()[1:]
 with open("main.js", "r", encoding = "iso8859-2") as f:
     file = f.read()
 mac = re.search("(// @version +)[^\n]+\n", file)

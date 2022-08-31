@@ -13,14 +13,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Upd script version
-        run: python ./release.py
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v4
-        with:
-          author_name: GITHUB_ACTION
-          author_email: zeroetime@163.com
-          message: "(chore) update version"
-          add: "main.js"
+        run: |
+          echo ${{ github.ref }} > temp
+          python ./release.py
       - name: Prepare file
         run: mv main.js nflsoj-helper.min.user.js
       - name: Release
