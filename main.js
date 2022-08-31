@@ -153,6 +153,14 @@ if (domain == "/") {
         alert("Success");
         document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
     });
+    let page = GET(document.body.innerHTML.slice(
+        document.body.innerHTML.search("/user/"),
+        document.body.innerHTML.search("我的比赛") - 27
+    ));
+    document.getElementsByClassName("right floated five wide column")[0].innerHTML += page.slice(
+        page.lastIndexOf("row") - 12,
+        page.indexOf("script>\n$") - 36
+    );
 } else if (/^\/user\/\d+(\/|$)/.test(domain)) {
     let imageurl = yourProfilePicture, imgPath = getElement("blurring dimmable image")[0].childNodes[3];
     if (imgPath) {
@@ -170,12 +178,12 @@ if (domain == "/") {
         value = value.parentNode.parentNode.parentNode;
         value.innerHTML = value.innerHTML.slice(
             0,
-            value.innerHTML.search(/<\/div>\n  \n  <div class="row">/) + 12
+            value.innerHTML.indexOf(`<\/div>\n  \n  <div class="row">`) + 12
         ) + bzoj.slice(
-            bzoj.search(/<\/div><div class="row">/) + 6,
-            bzoj.search(/<div class="ui vertical footer segment">/) - 267
+            bzoj.indexOf(`<\/div><div class="row>`) + 6,
+            bzoj.indexOf(`<div class="ui vertical footer segment">`) - 267
         ) + value.innerHTML.slice(
-            value.innerHTML.search(/数据范围与提示/) - 98
+            value.innerHTML.indexOf(`数据范围与提示`) - 98
         );
     }
 }
