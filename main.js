@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NFLSOJ Helper
 // @namespace    https://github.com/NFLSCode/nflsoj-helper
-// @version      0.6.1
+// @version      VERSION
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match        *://www.nfls.com.cn:20035/*
