@@ -163,4 +163,19 @@ if (domain == "/") {
         backup = getElement("icon")[14].outerHTML, customIcon = getUserIcon(mainpage[3].innerHTML);
     mainpage[0].innerHTML = nameColor;
     getElement("header")[1].innerHTML = nameColor + " " + (customIcon ? customIcon : /(man|woman) icon/.test(backup) ? backup : "");
+} else if (/\/problem\//.test(domain)) {
+    let value = document.getElementsByClassName("ui bottom attached segment font-content")[0];
+    if (value.innerText == "题目描述") {
+        let bzoj = GET(value.firstChild.firstChild.firstChild.href);
+        value = value.parentNode.parentNode.parentNode;
+        value.innerHTML = value.innerHTML.slice(
+            0,
+            value.innerHTML.search(/<\/div>\n  \n  <div class="row">/) + 12
+        ) + bzoj.slice(
+            bzoj.search(/<\/div><div class="row">/) + 6,
+            bzoj.search(/<div class="ui vertical footer segment">/) - 267
+        ) + value.innerHTML.slice(
+            value.innerHTML.search(/数据范围与提示/) - 98
+        );
+    }
 }
