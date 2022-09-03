@@ -180,7 +180,7 @@ if (domain == "/") {
             0,
             value.innerHTML.indexOf(`</div>\n  \n  <div class="row">`) + 12
         ) + bzoj.slice(
-            bzoj.indexOf(`</div><div class="row>`) + 6,
+            bzoj.indexOf(`</div><div class="row">`) + 6,
             bzoj.indexOf(`<div class="ui vertical footer segment">`) - 267
         ) + value.innerHTML.slice(
             value.innerHTML.indexOf(`数据范围与提示`) - 98
