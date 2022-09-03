@@ -153,16 +153,6 @@ if (domain == "/") {
         alert("Success");
         document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
     });
-} else if (/^\/user\/\d+(\/|$)/.test(domain)) {
-    let imageurl = yourProfilePicture, imgPath = getElement("blurring dimmable image")[0].childNodes[3];
-    if (imgPath) {
-        imgPath.src=imageurl;
-    }
-    let mainpage = getElement("ui bottom attached segment"),
-        nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, getColor(mainpage[3].innerHTML)),
-        backup = getElement("icon")[14].outerHTML, customIcon = getUserIcon(mainpage[3].innerHTML);
-    mainpage[0].innerHTML = nameColor;
-    getElement("header")[1].innerHTML = nameColor + " " + (customIcon ? customIcon : /(man|woman) icon/.test(backup) ? backup : "");
 } else if (/\/problem\//.test(domain)) {
     let value = document.getElementsByClassName("ui bottom attached segment font-content")[0];
     if (value.innerText == "题目描述") {
