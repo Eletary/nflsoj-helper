@@ -14,7 +14,7 @@
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", yourProfilePicture = "https://cdn.luogu.com.cn/upload/usericon/150522.png"; // white
 function GET(url) {
-    var result;
+    let result;
     $.ajax({async: false, type: "GET", url: url, success: function(msg){result = msg;}}); // eslint-disable-line no-undef
     return result;
 }
@@ -51,7 +51,7 @@ function addCopy(button, code) {
         setTimeout(function(){button.textContent = "Copy";}, 1000);
     })
 }
-var clickCountForCode = 0;
+let clickCountForCode = 0;
 function formatCode() {
     clickCountForCode ^= 1;
     let value = getElement("ui existing segment")[0];
@@ -77,7 +77,7 @@ if (!(/login/.test(domain))) {
                                  Copy</div>`;
             if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
             else if (e[i].firstChild.localName != "pre") {
-                var href = domain.match(/\/article\/\d+/)[0];
+                let href = domain.match(/\/article\/\d+/)[0];
                 if (href) addCopy(e[i].lastChild, getDOM(window.location.origin + href + "/edit").getElementById("content"));
                 continue;
             }
