@@ -153,7 +153,7 @@ if (domain == "/") {
         <h4 text>官网链接</text>
         <a class="ui blue button" style="position:relative;left:20px;" href="https://github.com/${repo}/">
             <i class="ui linkify icon"></i><text style="position:relative;left:0px;">转到 NFLSOJ Helper 官方主页</text></a>
-        <a class="ui green button" style="position:relative;left:20px;" id="l1"}/nflsoj-helper.min.user.js">
+        <a class="ui green button" style="position:relative;left:20px;" id="l1">
             <i class="repeat icon"></i><text style="position:relative;left:0px;">获取最新版</text>
         </a></td></tr><tr><td>
         <h4 text>主要功能</text>
