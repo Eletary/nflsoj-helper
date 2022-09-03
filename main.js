@@ -153,14 +153,6 @@ if (domain == "/") {
         alert("Success");
         document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
     });
-    let page = GET(document.body.innerHTML.slice(
-        document.body.innerHTML.search("/user/"),
-        document.body.innerHTML.search("我的比赛") - 27
-    ));
-    document.getElementsByClassName("right floated five wide column")[0].innerHTML += page.slice(
-        page.lastIndexOf("row") - 12,
-        page.indexOf("script>\n$") - 36
-    );
 } else if (/^\/user\/\d+(\/|$)/.test(domain)) {
     let imageurl = yourProfilePicture, imgPath = getElement("blurring dimmable image")[0].childNodes[3];
     if (imgPath) {
