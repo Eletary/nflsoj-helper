@@ -97,7 +97,7 @@ function genColorHTML(t, data, name, color) {
     return `<${t} ${data}><span style="color:${color[0]}">${name[0]}</span><span style="color:${color[1]};">${name.slice(1)}</span></${t}>`;
 }
 function getUserIcon(request) {
-    let icon = request.match(/##\{(\w+ icon)\}/);
+    let icon = request.match(/##\{([\s\S]+ icon)\}/);
     return icon ? `<i class="${icon[1]}"></i>` : null;
 }
 if (/^\/user\/\d+(\/|$)/.test(domain)) {
@@ -109,7 +109,7 @@ if (/^\/user\/\d+(\/|$)/.test(domain)) {
     mainpage[0].innerHTML = nameColor;
     getElement("header")[1].innerHTML = nameColor + " " + (customIcon ? customIcon : /(man|woman) icon/.test(backup) ? backup : "");
 } else if (domain == "/") {
-    let tourist = {"20200131": ["black", "red"], "sszcdjr": ["black", "red"]};
+    let tourist = {"20200131": ["black", "red"], "sszcdjr": ["black", "red"], "Kevin090228" : ["black", "red"]};
     for (var i = 1; i < 40; i += 2) {
         let td = getElement("ui very basic center aligned table")[0].tBodies[0].childNodes[i], name = td.childNodes[3].innerText;
         td.childNodes[3].innerHTML = genColorHTML(
