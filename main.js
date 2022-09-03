@@ -12,7 +12,7 @@
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // ==/UserScript==
 
-let domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", yourProfilePicture = "https://cdn.luogu.com.cn/upload/usericon/150522.png"; // white
+const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", yourProfilePicture = "https://cdn.luogu.com.cn/upload/usericon/150522.png"; // white
 function GET(url) {
     var result;
     $.ajax({async: false, type: "GET", url: url, success: function(msg){result = msg;}}); // eslint-disable-line no-undef
@@ -109,7 +109,7 @@ if (/^\/user\/\d+(\/|$)/.test(domain)) {
     getElement("header")[1].innerHTML = nameColor + " " + (customIcon ? customIcon : /(man|woman) icon/.test(backup) ? backup : "");
 } else if (domain == "/") {
     let tourist = {"20200131": ["black", "red"], "sszcdjr": ["black", "red"], "Kevin090228" : ["black", "red"]};
-    for (var i = 1; i < 40; i += 2) {
+    for (let i = 1; i < 40; i += 2) {
         let td = getElement("ui very basic center aligned table")[0].tBodies[0].childNodes[i], name = td.childNodes[3].innerText;
         td.childNodes[3].innerHTML = genColorHTML(
             "a", `href=${td.childNodes[3].childNodes[0].getAttribute("href")}`, name,
@@ -128,15 +128,15 @@ if (/ranklist|repeat/.test(domain)) {
     let head = document.getElementsByTagName("tr")[0], pos = /ranklist/.test(domain) ? head.innerHTML.indexOf("</th>") + 5 : 0;
     if (head.innerHTML.indexOf("用户名") == -1) {
         setTimeout(function() {
-            var name = [];
+            let name = [];
             let arr = document.getElementsByTagName("tbody")[0].rows;
-            for (i = 0; i < arr.length; ++i) {
+            for (let i = 0; i < arr.length; ++i) {
                 console.log("Getting User", i);
                 let raw = GET(window.location.origin + arr[i].innerHTML.match(/\/submission\/\d+/)[0]);
                 name.push(`<td><a href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`);
             }
             head.innerHTML = head.innerHTML.slice(0, pos) + "<th>用户名</th>" + head.innerHTML.slice(pos);
-            for (i = 0; i < arr.length; ++i) {
+            for (let i = 0; i < arr.length; ++i) {
                 let pos = /ranklist/.test(domain) ? arr[i].innerHTML.indexOf("</td>") : 0;
                 arr[i].innerHTML = arr[i].innerHTML.slice(0, pos) + name[i] + arr[i].innerHTML.slice(pos);
             }
