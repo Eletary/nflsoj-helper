@@ -24,7 +24,7 @@ function getDOM(href) {
 function getElement(request) {
     return document.getElementsByClassName(request);
 }
-// totalstyle module
+/******************** totalstyle module ********************/
 function betterBorder(p) {
     p.style.backgroundColor = "rgba(255,255,255)";
     p.style.padding = "14px";
@@ -43,7 +43,7 @@ if (localStorage.getItem("bgurl")) {
 document.body.style.backgroundSize = "cover";
 if (!localStorage.getItem("fgopacity")) localStorage.setItem("fgopacity", "0.8");
 document.body.style.opacity = localStorage.getItem("fgopacity");
-// copy module
+/******************** copy module ********************/
 function addCopy(button, code) {
     button.addEventListener("click", function() {
         GM_setClipboard(code.textContent, "text"); // eslint-disable-line no-undef
@@ -85,7 +85,7 @@ if (!(/login/.test(domain))) {
         }
     }
 }
-// userstyle module
+/******************** userstyle module ********************/
 function getColor(request) {
     let fir = request.match(/(?<=##)#[0-9a-fA-F]{6}/),
         res = request.match(/(?<=(?<!#)#)#[0-9a-fA-F]{6}/);
@@ -123,7 +123,7 @@ Array.from(document.getElementsByClassName("ui comments")).forEach(function(valu
     value.style.boxShadow = "0 1px 2px 0 rgb(34 36 38 / 15%)";
     value.style.border = "1px solid rgba(34,36,38,.15)";
 });
-// rank module
+/******************** rank module ********************/
 if (/ranklist|repeat/.test(domain)) {
     let head = document.getElementsByTagName("tr")[0], pos = /ranklist/.test(domain) ? head.innerHTML.indexOf("</th>") + 5 : 0;
     if (head.innerHTML.indexOf("用户名") == -1) {
@@ -133,7 +133,7 @@ if (/ranklist|repeat/.test(domain)) {
             for (i = 0; i < arr.length; ++i) {
                 console.log("Getting User", i);
                 let raw = GET(window.location.origin + arr[i].innerHTML.match(/\/submission\/\d+/)[0]);
-                name.push(`<td><a href="${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`);
+                name.push(`<td><a href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`);
             }
             head.innerHTML = head.innerHTML.slice(0, pos) + "<th>用户名</th>" + head.innerHTML.slice(pos);
             for (i = 0; i < arr.length; ++i) {
@@ -143,7 +143,7 @@ if (/ranklist|repeat/.test(domain)) {
         }, 0);
     }
 }
-// dashboard
+/******************** dashboard ********************/
 if (domain == "/") {
     let col = document.getElementsByClassName("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
     col.innerHTML = col.innerHTML.slice(0, ind) + `
@@ -172,19 +172,19 @@ if (domain == "/") {
         alert("Success");
         document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
     });
-} 
-// deserted BZOJ module
-let value = document.getElementsByClassName("ui bottom attached segment font-content")[0];
-if (value.innerText == "题目描述") {
-    let bzoj = GET(value.firstChild.firstChild.firstChild.href);
-    value = value.parentNode.parentNode.parentNode;
-    value.innerHTML = value.innerHTML.slice(
-        0,
-        value.innerHTML.indexOf(`</div>\n  \n  <div class="row">`) + 12
-    ) + bzoj.slice(
-        bzoj.indexOf(`</div><div class="row">`) + 6,
-        bzoj.indexOf(`<div class="ui vertical footer segment">`) - 266
-    ).replaceAll("upload/", "/bzoj/JudgeOnline/upload/") + value.innerHTML.slice(
-        value.innerHTML.indexOf("数据范围与提示") == -1 ? value.innerHTML.indexOf(`return submit_code()`) - 158 : value.innerHTML.indexOf("数据范围与提示") - 98
-    );
 }
+/******************** BZOJ module (deserted) ********************/
+// let value = document.getElementsByClassName("ui bottom attached segment font-content")[0];
+// if (value.innerText == "题目描述") {
+//     let bzoj = GET(value.firstChild.firstChild.firstChild.href);
+//     value = value.parentNode.parentNode.parentNode;
+//     value.innerHTML = value.innerHTML.slice(
+//         0,
+//         value.innerHTML.indexOf(`</div>\n  \n  <div class="row">`) + 12
+//     ) + bzoj.slice(
+//         bzoj.indexOf(`</div><div class="row">`) + 6,
+//         bzoj.indexOf(`<div class="ui vertical footer segment">`) - 266
+//     ).replaceAll("upload/", "/bzoj/JudgeOnline/upload/") + value.innerHTML.slice(
+//         value.innerHTML.indexOf("数据范围与提示") == -1 ? value.innerHTML.indexOf(`return submit_code()`) - 158 : value.innerHTML.indexOf("数据范围与提示") - 98
+//     );
+// }
