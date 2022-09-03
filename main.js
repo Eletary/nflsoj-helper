@@ -12,7 +12,7 @@
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // ==/UserScript==
 
-let domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", yourProfilePicture = "https://cdn.luogu.com.cn/upload/image_hosting/xvwylozn.png"; // white
+let domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", yourProfilePicture = "https://cdn.luogu.com.cn/upload/usericon/150522.png"; // white
 function GET(url) {
     var result;
     $.ajax({async: false, type: "GET", url: url, success: function(msg){result = msg;}}); // eslint-disable-line no-undef
