@@ -12,15 +12,14 @@
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // ==/UserScript==
 
-let domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", yourProfilePicture = "https://cdn.luogu.com.cn/upload/usericon/150522.png"; // white
+let domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", yourProfilePicture = "https://cdn.luogu.com.cn/upload/image_hosting/xvwylozn.png"; // white
 function GET(url) {
     var result;
     $.ajax({async: false, type: "GET", url: url, success: function(msg){result = msg;}}); // eslint-disable-line no-undef
     return result;
 }
-function getDiscuss(href) {
-    let doc = new DOMParser().parseFromString(GET(href), "text/html");
-    return doc.getElementById("content");
+function getDOM(href) {
+    return new DOMParser().parseFromString(GET(href), "text/html");
 }
 function getElement(request) {
     return document.getElementsByClassName(request);
@@ -79,7 +78,7 @@ if (!(/login/.test(domain))) {
             if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
             else if (e[i].firstChild.localName != "pre") {
                 var href = domain.match(/\/article\/\d+/)[0];
-                if (href) addCopy(e[i].lastChild, getDiscuss(window.location.origin + href + "/edit"));
+                if (href) addCopy(e[i].lastChild, getDOM(window.location.origin + href + "/edit").getElementById("content"));
                 continue;
             }
             addCopy(e[i].lastChild, e[i].childNodes[0]);
@@ -124,6 +123,26 @@ Array.from(document.getElementsByClassName("ui comments")).forEach(function(valu
     value.style.boxShadow = "0 1px 2px 0 rgb(34 36 38 / 15%)";
     value.style.border = "1px solid rgba(34,36,38,.15)";
 });
+// rank module
+if (/ranklist|repeat/.test(domain)) {
+    let head = document.getElementsByTagName("tr")[0], pos = /ranklist/.test(domain) ? head.innerHTML.indexOf("</th>") + 5 : 0;
+    if (head.innerHTML.indexOf("用户名") == -1) {
+        setTimeout(function() {
+            var name = [];
+            let arr = document.getElementsByTagName("tbody")[0].rows;
+            for (i = 0; i < arr.length; ++i) {
+                console.log("Getting User", i);
+                let raw = GET(window.location.origin + arr[i].innerHTML.match(/\/submission\/\d+/)[0]);
+                name.push(`<td><a href="${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`);
+            }
+            head.innerHTML = head.innerHTML.slice(0, pos) + "<th>用户名</th>" + head.innerHTML.slice(pos);
+            for (i = 0; i < arr.length; ++i) {
+                let pos = /ranklist/.test(domain) ? arr[i].innerHTML.indexOf("</td>") : 0;
+                arr[i].innerHTML = arr[i].innerHTML.slice(0, pos) + name[i] + arr[i].innerHTML.slice(pos);
+            }
+        }, 0);
+    }
+}
 // dashboard
 if (domain == "/") {
     let col = document.getElementsByClassName("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
@@ -153,19 +172,19 @@ if (domain == "/") {
         alert("Success");
         document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
     });
-} else if (/\/problem\//.test(domain)) {
-    let value = document.getElementsByClassName("ui bottom attached segment font-content")[0];
-    if (value.innerText == "题目描述") {
-        let bzoj = GET(value.firstChild.firstChild.firstChild.href);
-        value = value.parentNode.parentNode.parentNode;
-        value.innerHTML = value.innerHTML.slice(
-            0,
-            value.innerHTML.indexOf(`</div>\n  \n  <div class="row">`) + 12
-        ) + bzoj.slice(
-            bzoj.indexOf(`</div><div class="row">`) + 6,
-            bzoj.indexOf(`<div class="ui vertical footer segment">`) - 266
-        ) + value.innerHTML.slice(
-            value.innerHTML.indexOf("数据范围与提示") == -1 ? value.innerHTML.indexOf(`return submit_code()`) - 157 : value.innerHTML.indexOf(`数据范围与提示`) - 98
-        );
-    }
+} 
+// deserted BZOJ module
+let value = document.getElementsByClassName("ui bottom attached segment font-content")[0];
+if (value.innerText == "题目描述") {
+    let bzoj = GET(value.firstChild.firstChild.firstChild.href);
+    value = value.parentNode.parentNode.parentNode;
+    value.innerHTML = value.innerHTML.slice(
+        0,
+        value.innerHTML.indexOf(`</div>\n  \n  <div class="row">`) + 12
+    ) + bzoj.slice(
+        bzoj.indexOf(`</div><div class="row">`) + 6,
+        bzoj.indexOf(`<div class="ui vertical footer segment">`) - 266
+    ).replaceAll("upload/", "/bzoj/JudgeOnline/upload/") + value.innerHTML.slice(
+        value.innerHTML.indexOf("数据范围与提示") == -1 ? value.innerHTML.indexOf(`return submit_code()`) - 158 : value.innerHTML.indexOf("数据范围与提示") - 98
+    );
 }
