@@ -59,6 +59,13 @@ function addCopy(button, code) {
         setTimeout(function(){button.textContent = "Copy";}, 1000);
     })
 }
+function articleAddCopy(button, code) {
+    button.addEventListener("click", function() {
+        GM_setClipboard(code.textContent, "text"); // eslint-disable-line no-undef
+        button.childNodes[1].textContent = "复制成功!";
+        setTimeout(function(){button.childNodes[1].textContent = "复制";}, 1000);
+    })
+}
 let clickCountForCode = 0;
 function formatCode() {
     clickCountForCode ^= 1;
@@ -86,7 +93,19 @@ if (!(/login/.test(domain))) {
             if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
             else if (e[i].firstChild.localName != "pre") {
                 let href = domain.match(/\/article\/\d+/)[0];
-                if (href) addCopy(e[i].lastChild, getDOM(window.location.origin + href + "/edit").getElementById("content"));
+                if (href){
+                    if(document.getElementsByClassName("ui mini right floated labeled icon button")[1]){
+                        document.getElementsByClassName("ui mini right floated labeled icon button")[1].parentNode.innerHTML+=`<a style="margin-top: -4px; margin-right: 3px; color: rgba(255,255,255); " class="ui mini orange right floated labeled icon button" ><i class="ui copy icon"></i>复制</a>`;
+                        let articleCopy=document.getElementsByClassName("ui mini right floated labeled icon button")[1].parentNode.lastChild;
+                        articleAddCopy(articleCopy, getDOM(window.location.origin + href + "/edit").getElementById("content"));
+                        document.getElementsByClassName("ui existing segment")[0].removeChild(document.getElementsByClassName("ui existing segment")[0].lastChild);
+                    }else{
+                        document.getElementsByClassName("padding")[0].childNodes[5].innerHTML+=`<a style="margin-top: -4px; color: rgba(255,255,255); " class="ui mini orange right floated labeled icon button" ><i class="ui copy icon"></i>复制</a>`;
+                        let articleCopy=document.getElementsByClassName("padding")[0].childNodes[5].lastChild;
+                        articleAddCopy(articleCopy, getDOM(window.location.origin + href + "/edit").getElementById("content"));
+                        document.getElementsByClassName("ui existing segment")[0].removeChild(document.getElementsByClassName("ui existing segment")[0].lastChild);
+                    }
+                }
                 continue;
             }
             addCopy(e[i].lastChild, e[i].childNodes[0]);
