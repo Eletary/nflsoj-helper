@@ -31,9 +31,9 @@ function betterBorder(p) {
     p.style.border = "thin solid rgba(200,200,200,0.5)";
 }
 if (/contests|practices/.test(domain)) {
-    betterBorder(getElement("padding")[0].childNodes[1]);
-} else if (/submissions|discussion|ranklist|repeat/.test(domain)) {
-    betterBorder(getElement("padding")[0].childNodes[3]);
+    betterBorder(getElement("padding")[0].children[0]);
+} else if (/submissions|ranklist|repeat/.test(domain)) {
+    betterBorder(getElement("padding")[0].children[1]);
 } else if (/cp/.test(domain)) {
     betterBorder(getElement("fixed-table-body")[0]);
 }
@@ -55,8 +55,8 @@ let clickCountForCode = 0;
 function formatCode() {
     clickCountForCode ^= 1;
     let value = getElement("ui existing segment")[0];
-    value.childNodes[4].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode; // eslint-disable-line no-undef
-    value.childNodes[0].childNodes[2].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
+    value.children[1].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode; // eslint-disable-line no-undef
+    value.children[0].children[1].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
 }
 if (!(/login/.test(domain))) {
     if (/^\/submission\/\d+(\/|$)/.test(domain)) {
@@ -69,8 +69,8 @@ if (!(/login/.test(domain))) {
                                Copy
                              </div>${value.innerHTML.slice(0, position)}
                            </span>${value.innerHTML.slice(position)}`;
-        addCopy(value.firstChild.childNodes[1], value.lastChild);
-        value.childNodes[0].childNodes[2].addEventListener("click", formatCode);
+        addCopy(value.firstChild.children[0], value.lastChild);
+        value.children[0].children[1].addEventListener("click", formatCode);
     } else {
         for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
             e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
@@ -100,7 +100,7 @@ function getUserIcon(request) {
     return icon ? `<i class="${icon[1]}"></i>` : null;
 }
 if (/^\/user\/\d+(\/|$)/.test(domain)) {
-    let imageurl = yourProfilePicture, imgPath = getElement("blurring dimmable image")[0].childNodes[3];
+    let imageurl = yourProfilePicture, imgPath = getElement("blurring dimmable image")[0].children[1];
     if (imgPath) imgPath.src=imageurl;
     let mainpage = getElement("ui bottom attached segment"),
         nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, getColor(mainpage[3].innerHTML)),
@@ -109,14 +109,14 @@ if (/^\/user\/\d+(\/|$)/.test(domain)) {
     getElement("header")[1].innerHTML = nameColor + " " + (customIcon ? customIcon : /(man|woman) icon/.test(backup) ? backup : "");
 } else if (domain == "/") {
     let tourist = {"20200131": ["black", "red"], "sszcdjr": ["black", "red"], "Kevin090228" : ["black", "red"]};
-    for (let i = 1; i < 40; i += 2) {
-        let td = getElement("ui very basic center aligned table")[0].tBodies[0].childNodes[i], name = td.childNodes[3].innerText;
-        td.childNodes[3].innerHTML = genColorHTML(
-            "a", `href=${td.childNodes[3].childNodes[0].getAttribute("href")}`, name,
+    for (let i = 0; i < 20; ++i) {
+        let td = getElement("ui very basic center aligned table")[0].tBodies[0].children[i], name = td.children[1].innerText;
+        td.children[1].innerHTML = genColorHTML(
+            "a", `href=${td.children[1].children[0].getAttribute("href")}`, name,
             Object.prototype.hasOwnProperty.call(tourist, name) ? tourist[name] : getColor(td.childNodes[9].textContent));
     }
 }
-Array.from(document.getElementsByClassName("ui comments")).forEach(function(value) {
+Array.from(getElement("ui comments")).forEach(function(value) {
     value.style.backgroundColor = "#fff";
     value.style.padding = "1em";
     value.style.borderRadius = "0.28571429rem";
@@ -131,8 +131,8 @@ if (/ranklist|repeat/.test(domain)) {
             let name = [];
             let arr = document.getElementsByTagName("tbody")[0].rows;
             for (let i = 0; i < arr.length; ++i) {
-                console.log("Getting User", i);
-                let raw = GET(window.location.origin + arr[i].innerHTML.match(/\/submission\/\d+/)[0]);
+                console.log("Getting User", i + 1);
+                let raw = GET(arr[i].innerHTML.match(/\/submission\/\d+/)[0]);
                 name.push(`<td><a href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`);
             }
             head.innerHTML = head.innerHTML.slice(0, pos) + "<th>用户名</th>" + head.innerHTML.slice(pos);
@@ -145,7 +145,7 @@ if (/ranklist|repeat/.test(domain)) {
 }
 /******************** dashboard ********************/
 if (domain == "/") {
-    let col = document.getElementsByClassName("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
+    let col = getElement("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
     col.innerHTML = col.innerHTML.slice(0, ind) + `
     <h4 class="ui top attached block header"><img src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" style="width:20px;height:20px;">NFLSOJ Helper控制面板</h4>
     <div class="ui bottom attached segment">
@@ -174,7 +174,7 @@ if (domain == "/") {
     });
 }
 /******************** BZOJ module (deserted) ********************/
-// let value = document.getElementsByClassName("ui bottom attached segment font-content")[0];
+// let value = getElement("ui bottom attached segment font-content")[0];
 // if (value.innerText == "题目描述") {
 //     let bzoj = GET(value.firstChild.firstChild.firstChild.href);
 //     value = value.parentNode.parentNode.parentNode;
