@@ -33,7 +33,7 @@ function betterBorder(p) {
 }
 if (/contests|practices/.test(domain)) {
     betterBorder(getElement("padding")[0].children[0]);
-} else if (/submissions|ranklist|repeat/.test(domain)) {
+} else if (/submissions|\d+\/ranklist|repeat|discussion/.test(domain)) {
     betterBorder(getElement("padding")[0].children[1]);
 } else if (/cp/.test(domain)) {
     betterBorder(getElement("fixed-table-body")[0]);
@@ -44,6 +44,13 @@ if (String(localStorage.getItem("bgurl")) != "null") {
 document.body.style.backgroundSize = "cover";
 if (!localStorage.getItem("fgopacity")) localStorage.setItem("fgopacity", "0.8");
 document.body.style.opacity = localStorage.getItem("fgopacity");
+Array.from(getElement("ui comments")).forEach(function(value) {
+    value.style.backgroundColor = "#fff";
+    value.style.padding = "1em";
+    value.style.borderRadius = "0.28571429rem";
+    value.style.boxShadow = "0 1px 2px 0 rgb(34 36 38 / 15%)";
+    value.style.border = "1px solid rgba(34,36,38,.15)";
+});
 /******************** copy module ********************/
 function addCopy(button, code) {
     button.addEventListener("click", function() {
@@ -120,13 +127,6 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
             Object.prototype.hasOwnProperty.call(tourist, name) ? tourist[name] : getColor(td.childNodes[9].textContent));
     }
 }
-Array.from(getElement("ui comments")).forEach(function(value) {
-    value.style.backgroundColor = "#fff";
-    value.style.padding = "1em";
-    value.style.borderRadius = "0.28571429rem";
-    value.style.boxShadow = "0 1px 2px 0 rgb(34 36 38 / 15%)";
-    value.style.border = "1px solid rgba(34,36,38,.15)";
-});
 /******************** rating module ********************/
 function getEloWinProbability(ra, rb) {
     return 1.0 / (1 + Math.pow(10, (rb - ra) / 400.0));
@@ -214,7 +214,7 @@ async function Rating() {
     }
 }
 /******************** rank module ********************/
-if (/ranklist|repeat/.test(domain)) {
+if (/\d+\/(ranklist|repeat)/.test(domain)) {
     setTimeout(async function() {
         let head = document.getElementsByTagName("tr")[0], pos = /ranklist/.test(domain) ? head.innerHTML.indexOf("</th>") + 5 : 0;
         if (head.innerHTML.indexOf("用户名") == -1) {
