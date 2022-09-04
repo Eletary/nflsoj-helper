@@ -189,20 +189,18 @@ async function Rating() {
           curRating = /<i class="star icon"><\/i>积分 (\d+)/;
     let arr = document.getElementsByTagName("tbody")[0].rows, c = Array.from({length: arr.length}, (v, i) => i);
     if (GET(arr[0].innerHTML.match(/\/user\/\d+/)[0]).match(hisRating) != null) {
-        let requests = c.map((i) => async function() {
+        c = await Promise.all(c.map((i) => async function() {
             let res;
             await $.get(arr[i].innerHTML.match(/\/user\/\d+/)[0], function(p) {res = p.match(hisRating)[1];}); // eslint-disable-line no-undef
             return res;
-        }());
-        c = await Promise.all(requests);
+        }()));
     } else {
-        let requests = c.map((i) => async function() {
+        c = calcRating(await Promise.all(c.map((i) => async function() {
             let res = {};
             await $.get(arr[i].innerHTML.match(/\/user\/\d+/)[0], function(p) {res.currentRating = parseInt(p.match(curRating)[1])}); // eslint-disable-line no-undef
             res.rank = arr[i].children[0].innerText;
             return res;
-        }());
-        c = calcRating(await Promise.all(requests));
+        }())));
         for (let i = 0; i < arr.length; ++i) {
             let n = Math.round(c[i].rank);
             c[i] = `<td>${Math.round(c[i].currentRating)}<span class="rating_${n>=0?"up":"down"}">(${(n<0?"":"+")+n})</span></td>`;
@@ -220,14 +218,13 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
         if (head.innerHTML.indexOf("用户名") == -1) {
             let arr = document.getElementsByTagName("tbody")[0].rows;
             let name = Array.from({length: arr.length}, (v, i) => i);
-            let requests = name.map((i) => async function() {
+            name = await Promise.all(name.map((i) => async function() {
                 let res;
                 await $.get(arr[i].innerHTML.match(/\/submission\/\d+/)[0], function(raw) { // eslint-disable-line no-undef
                     res = `<td><a href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`;
                 });
                 return res;
-            }());
-            name = await Promise.all(requests);
+            }()));
             head.innerHTML = head.innerHTML.slice(0, pos) + "<th>用户名</th>" + head.innerHTML.slice(pos);
             for (let i = 0; i < arr.length; ++i) {
                 let pos = /ranklist/.test(domain) ? arr[i].innerHTML.indexOf("</td>") : 0;
