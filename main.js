@@ -42,12 +42,16 @@ function versionCompare(sources, dests) {
     return false;
 }
 if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
-    setTimeout(function() {
-        let latest = GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name;
-        if (versionCompare(latest.slice(1), GM_info.script.header.match(/@version +([^\n]+)\n/)[1]) && confirm(`检测到新版本 ${latest}，是否更新？`)) { // eslint-disable-line no-undef
-            window.location.href = `https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name}/nflsoj-helper.min.user.js`;
-        }
-    }, 0);
+    let today = new Date(Date.now()).toDateString();
+    if (localStorage.getItem("last_updated") != today) {
+        setTimeout(function() {
+            let latest = GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name;
+            if (versionCompare(latest.slice(1), GM_info.script.header.match(/@version +([^\n]+)\n/)[1]) && confirm(`检测到新版本 ${latest}，是否更新？`)) { // eslint-disable-line no-undef
+                window.location.href = `https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name}/nflsoj-helper.min.user.js`;
+            }
+        }, 0);
+        localStorage.setItem("last_updated", today);
+    }
 }
 /******************** totalstyle module ********************/
 function betterBorder(p) {
@@ -314,6 +318,7 @@ if (domain == "/") {
     </div>` + col.innerHTML.slice(ind);
     document.getElementById("l1").addEventListener("click", function() {
         localStorage.setItem("disable_auto_update", document.getElementById("l1").checked ? "N" : "Y");
+        if (document.getElementById("l1").checked) localStorage.removeItem("last_updated");
     });
     document.getElementById("l2").addEventListener("click", function() {
         window.location.href = `https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name}/nflsoj-helper.min.user.js`;
