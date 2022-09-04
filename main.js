@@ -147,19 +147,48 @@ if (/ranklist|repeat/.test(domain)) {
 if (domain == "/") {
     let col = document.getElementsByClassName("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
     col.innerHTML = col.innerHTML.slice(0, ind) + `
-    <h4 class="ui top attached block header"><img src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" style="width:20px;height:20px;">NFLSOJ Helper控制面板</h4>
+    <h4 class="ui top attached block header">
+        <img src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" style="width:20px;height:20px;" />
+        NFLSOJ Helper控制面板
+    </h4>
     <div class="ui bottom attached segment">
-        <table class="ui very basic table" style="table-layout: fixed; "><tr><td>
-        <h4 text>官网链接</text>
-        <a class="ui blue button" style="position:relative;left:20px;" href="https://github.com/${repo}/">
-            <i class="ui linkify icon"></i><text style="position:relative;left:0px;">转到 NFLSOJ Helper 官方主页</text></a>
-        <a class="ui green button" style="position:relative;left:20px;" id="l1">
-            <i class="repeat icon"></i><text style="position:relative;left:0px;">获取最新版</text>
-        </a></td></tr><tr><td>
-        <h4 text>主要功能</text>
-        <span class="ui button" style="position:relative;left:20px;" id="f1">延长登录时间</span>
-        <span class="ui button" style="position:relative;left:20px;" id="f2">更换背景</span>
-        </td></tr></table></div>` + col.innerHTML.slice(ind);
+        <table class="ui very basic table" style="table-layout: fixed;">
+            <tr>
+                <td>
+                    <h4 style="display:inline;">
+                        官网链接
+                    </h4>
+                    <a class="ui blue button" href="https://github.com/${repo}/">
+                        <i class="ui linkify icon">
+                        </i>
+                        转到 NFLSOJ Helper 官方主页
+                    </a>
+                    <a class="ui green button" id="l1">
+                        <i class="repeat icon">
+                        </i>
+                        获取最新版
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h4 style="display:inline;">
+                        主要功能
+                    </h4>
+                    <a class="ui button" id="f1">
+                        <i class="icon code">
+                        </i>
+                        延长登录时间
+                    </a>
+                    <a class="ui button" id="f2">
+                        <i class="icon code">
+                        </i>
+                        更换背景
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>` + col.innerHTML.slice(ind);
     document.getElementById("l1").addEventListener("click", function() {
         window.location.href = `https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name}/nflsoj-helper.min.user.js`;
     });
@@ -169,8 +198,8 @@ if (domain == "/") {
     });
     document.getElementById("f2").addEventListener("click", function() {
         localStorage.setItem("bgurl", prompt("请输入背景链接，想删除背景选择“取消”，默认图片由GlaceonVGC提供", `https://raw.githubusercontent.com/${repo}/master/images/471.jpg`));
-        alert("Success");
         document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
+        alert("Success");
     });
 }
 /******************** BZOJ module (deserted) ********************/
