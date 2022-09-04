@@ -9,6 +9,7 @@
 // @require      http://www.nfls.com.cn:20035/cdnjs/jquery/3.3.1/jquery.min.js
 // @require      http://www.nfls.com.cn:20035/cdnjs/blueimp-md5/2.10.0/js/md5.min.js
 // @grant        GM_setClipboard
+// @grant        GM_info
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // ==/UserScript==
@@ -24,6 +25,29 @@ function getDOM(href) {
 }
 function getElement(request) {
     return document.getElementsByClassName(request);
+}
+/******************** autoupdate module ********************/
+function versionCompare(sources, dests) {
+    sources = sources.split('.');
+    dests = dests.split('.');
+    let maxL = Math.max(sources.length, dests.length);
+    for (let i = 0; i < maxL; ++i) {
+        let preValue = sources.length > i ? sources[i]: 0,
+            preNum = isNaN(Number(preValue)) ? preValue.charCodeAt() : Number(preValue),
+            lastValue = dests.length > i ? dests[i] : 0,
+            lastNum = isNaN(Number(lastValue)) ? lastValue.charCodeAt() : Number(lastValue);
+        if (preNum < lastNum) return false;
+        if (preNum > lastNum) return true;
+    }
+    return false;
+}
+if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
+    setTimeout(function() {
+        let latest = GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name;
+        if (versionCompare(latest.slice(1), GM_info.script.header.match(/@version +([^\n]+)\n/)[1]) && confirm(`检测到新版本 ${latest}，是否更新？`)) { // eslint-disable-line no-undef
+            window.location.href = `https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name}/nflsoj-helper.min.user.js`;
+        }
+    }, 0);
 }
 /******************** totalstyle module ********************/
 function betterBorder(p) {
@@ -54,7 +78,7 @@ Array.from(getElement("ui comments")).forEach(function(value) {
 /******************** copy module ********************/
 function addCopy(button, code) {
     button.addEventListener("click", function() {
-        GM_setClipboard(code.textContent, "text"); // eslint-disable-line no-undef
+        GM_setClipboard(code.textContent, "Copy"); // eslint-disable-line no-undef
         button.textContent = "Copied!";
         setTimeout(function(){button.textContent = "Copy";}, 1000);
     })
@@ -88,26 +112,20 @@ if (!(/login/.test(domain))) {
         value.children[0].children[1].addEventListener("click", formatCode);
         } else {
         for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
-            e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
-                                 Copy</div>`;
             if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
             else if (e[i].firstChild.localName != "pre") {
                 let href = domain.match(/\/article\/\d+/)[0];
-                if (href){
-                    if(document.getElementsByClassName("ui mini right floated labeled icon button")[1]){
-                        document.getElementsByClassName("ui mini right floated labeled icon button")[1].parentNode.innerHTML+=`<a style="margin-top: -4px; margin-right: 3px; color: rgba(255,255,255); " class="ui mini orange right floated labeled icon button" ><i class="ui copy icon"></i>复制</a>`;
-                        let articleCopy=document.getElementsByClassName("ui mini right floated labeled icon button")[1].parentNode.lastChild;
-                        articleAddCopy(articleCopy, getDOM(window.location.origin + href + "/edit").getElementById("content"));
-                        document.getElementsByClassName("ui existing segment")[0].removeChild(document.getElementsByClassName("ui existing segment")[0].lastChild);
-                    }else{
-                        document.getElementsByClassName("padding")[0].childNodes[5].innerHTML+=`<a style="margin-top: -4px; color: rgba(255,255,255); " class="ui mini orange right floated labeled icon button" ><i class="ui copy icon"></i>复制</a>`;
-                        let articleCopy=document.getElementsByClassName("padding")[0].childNodes[5].lastChild;
-                        articleAddCopy(articleCopy, getDOM(window.location.origin + href + "/edit").getElementById("content"));
-                        document.getElementsByClassName("ui existing segment")[0].removeChild(document.getElementsByClassName("ui existing segment")[0].lastChild);
-                    }
+                if (href) {
+                    let ownDiscuss = getElement("ui mini right floated labeled icon button")[1],
+                        articleCopy = ownDiscuss ? ownDiscuss.parentNode : getElement("padding")[0].childNodes[5];
+                    articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
+                                                <i class="ui copy icon"></i>复制</a>`;
+                    articleAddCopy(articleCopy.lastChild, getDOM(href + "/edit").getElementById("content"));
                 }
                 continue;
             }
+            e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
+                                 Copy</div>`;
             addCopy(e[i].lastChild, e[i].childNodes[0]);
         }
     }
@@ -222,7 +240,7 @@ async function Rating() {
         }())));
         for (let i = 0; i < arr.length; ++i) {
             let n = Math.round(c[i].rank);
-            c[i] = `<td>${Math.round(c[i].currentRating)}<span class="rating_${n>=0?"up":"down"}">(${(n<0?"":"+")+n})</span></td>`;
+            c[i] = `<td>${Math.round(c[i].currentRating)}<span class="rating_${n >= 0 ? "up" : "down"}">(${(n < 0 ? "" : "+") + n})</span></td>`;
         }
     }
     document.getElementsByTagName("thead")[0].rows[0].innerHTML += "<th>Rating(Δ)</th>";
@@ -232,62 +250,72 @@ async function Rating() {
 }
 /******************** rank module ********************/
 if (/\d+\/(ranklist|repeat)/.test(domain)) {
-    setTimeout(async function() {
-        let head = document.getElementsByTagName("tr")[0], pos = /ranklist/.test(domain) ? head.innerHTML.indexOf("</th>") + 5 : 0;
-        if (head.innerHTML.indexOf("用户名") == -1) {
-            let arr = document.getElementsByTagName("tbody")[0].rows;
-            let name = Array.from({length: arr.length}, (v, i) => i);
-            name = await Promise.all(name.map((i) => async function() {
-                let res;
-                await $.get(arr[i].innerHTML.match(/\/submission\/\d+/)[0], function(raw) { // eslint-disable-line no-undef
-                    res = `<td><a href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`;
-                });
-                return res;
-            }()));
-            head.innerHTML = head.innerHTML.slice(0, pos) + "<th>用户名</th>" + head.innerHTML.slice(pos);
-            for (let i = 0; i < arr.length; ++i) {
-                let pos = /ranklist/.test(domain) ? arr[i].innerHTML.indexOf("</td>") : 0;
-                arr[i].innerHTML = arr[i].innerHTML.slice(0, pos) + name[i] + arr[i].innerHTML.slice(pos);
-            }
+    let head = document.getElementsByTagName("tr")[0], pos = /ranklist/.test(domain) ? head.innerHTML.indexOf("</th>") + 5 : 0;
+    if (head.innerHTML.indexOf("用户名") == -1) {
+        let arr = document.getElementsByTagName("tbody")[0].rows;
+        let name = Array.from({length: arr.length}, (v, i) => i);
+        name = await Promise.all(name.map((i) => async function() {
+            let res;
+            await $.get(arr[i].innerHTML.match(/\/submission\/\d+/)[0], function(raw) { // eslint-disable-line no-undef
+                res = `<td><a href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`;
+            });
+            return res;
+        }()));
+        head.innerHTML = head.innerHTML.slice(0, pos) + "<th>用户名</th>" + head.innerHTML.slice(pos);
+        for (let i = 0; i < arr.length; ++i) {
+            let pos = /ranklist/.test(domain) ? arr[i].innerHTML.indexOf("</td>") : 0;
+            arr[i].innerHTML = arr[i].innerHTML.slice(0, pos) + name[i] + arr[i].innerHTML.slice(pos);
         }
-        if (/ranklist/.test(domain)) {
-            getElement("padding")[0].innerHTML = `<span class="ui mini right floated labeled icon button" id="rating" style="top:6px"><i class="calculator icon"></i>Predictor</span>`
-                                               + getElement("padding")[0].innerHTML;
-            document.getElementById("rating").addEventListener("click", Rating);
-        }
-    }, 0);
+    }
+    if (/ranklist/.test(domain)) {
+        getElement("padding")[0].innerHTML = `<span class="ui mini right floated labeled blue icon button" id="rating" style="top:6px;"><i class="calculator icon" id=calc></i><text>Predict Rating</text></span>`
+            + getElement("padding")[0].innerHTML;
+        document.getElementById("rating").addEventListener("click", async function() {
+            getElement("padding")[0].children[0].children[1].innerText = "Please Wait...";
+            await Rating();
+            getElement("padding")[0].children[0].children[1].innerText = "Done!";
+        });
+    }
 }
 /******************** dashboard ********************/
 if (domain == "/") {
     let col = getElement("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
     col.innerHTML = col.innerHTML.slice(0, ind) + `
     <h4 class="ui top attached block header">
-      <img src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" style="width:20px;height:20px;">
-      NFLSOJ Helper控制面板
+      <img src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" style="width:20px;height:20px;position:relative;top:-3px;">
+      NFLSOJ Helper 控制面板
     </h4>
     <div class="ui bottom attached segment">
       <table class="ui very basic table" style="table-layout: fixed;">
         <tr><td>
+          <h4 style="display:inline;">自动更新</h4>
+          <span class="ui toggle checkbox" style="position:relative;left:20px;top:4px;">
+            <input id="l1" type="checkbox" ${localStorage.getItem("disable_auto_update") == "Y" ? "" : "checked"}>
+            <label>  </label>
+          </span>
+        </td></tr>
+        <tr><td>
           <h4 style="display:inline;">官网链接</h4>
-          <a class="ui blue button" href="https://github.com/${repo}/">
-            <i class="ui linkify icon"></i>
-            转到 NFLSOJ Helper 官方主页
-          </a>
-          <a class="ui green button" id="l1">
+          <a class="ui blue button" style="position:relative;left:20px;" href="https://github.com/${repo}/">
+            <i class="ui linkify icon"></i>转到 NFLSOJ Helper 官方主页
+          </a><a class="ui green button" id="l2" style="position:relative;left:20px;">
             <i class="repeat icon"></i>获取最新版
           </a>
         </td></tr>
         <tr><td>
           <h4 style="display:inline;">主要功能</h4>
-          <a class="ui button" id="f1">
+          <a class="ui button" id="f1" style="position:relative;left:20px;">
             <i class="code icon"></i>延长登录时间
-          </a><a class="ui button" id="f2">
+          </a><a class="ui button" id="f2" style="position:relative;left:20px;">
             <i class="code icon"></i>更换背景
           </a>
         </td></tr>
       </table>
     </div>` + col.innerHTML.slice(ind);
     document.getElementById("l1").addEventListener("click", function() {
+        localStorage.setItem("disable_auto_update", document.getElementById("l1").checked ? "N" : "Y");
+    });
+    document.getElementById("l2").addEventListener("click", function() {
         window.location.href = `https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name}/nflsoj-helper.min.user.js`;
     });
     document.getElementById("f1").addEventListener("click", function() {
