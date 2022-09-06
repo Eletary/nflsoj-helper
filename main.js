@@ -90,8 +90,8 @@ function addCopy(button, code) {
 function articleAddCopy(button, code) {
     button.addEventListener("click", function() {
         GM_setClipboard(code.textContent, "text"); // eslint-disable-line no-undef
-        button.childNodes[1].textContent = "复制成功!";
-        setTimeout(function(){button.childNodes[1].textContent = "复制";}, 1000);
+        button.lastChild.textContent = "复制成功!";
+        setTimeout(function(){button.lastChild.textContent = "复制";}, 1000);
     })
 }
 let clickCountForCode = 0;
