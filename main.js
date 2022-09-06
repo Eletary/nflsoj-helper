@@ -26,7 +26,7 @@ function getDOM(href) {
 function getElement(request) {
     return document.getElementsByClassName(request);
 }
-/******************** autoupdate module ********************/
+/******************** subscribe module ********************/
 function versionCompare(sources, dests) {
     sources = sources.split('.');
     dests = dests.split('.');
@@ -292,7 +292,7 @@ if (domain == "/") {
     <div class="ui bottom attached segment">
       <table class="ui very basic table" style="table-layout: fixed;">
         <tr><td>
-          <h4 style="display:inline;">自动更新</h4>
+          <h4 style="display:inline;">更新提醒</h4>
           <span class="ui toggle checkbox" style="position:relative;left:20px;top:4px;">
             <input id="l1" type="checkbox" ${localStorage.getItem("disable_auto_update") == "Y" ? "" : "checked"}>
             <label>  </label>
