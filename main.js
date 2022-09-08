@@ -13,15 +13,12 @@
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // ==/UserScript==
+/* global $ */
+
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper"; // white
-function GET(url) {
-    let result;
-    $.ajax({async: false, type: "GET", url: url, success: function(msg){result = msg;}}); // eslint-disable-line no-undef
-    return result;
-}
-function getDOM(href) {
-    return new DOMParser().parseFromString(GET(href), "text/html");
+async function getDOM(href) {
+    return new DOMParser().parseFromString(await $.get(href), "text/html");
 }
 function getElement(request) {
     return document.getElementsByClassName(request);
@@ -44,10 +41,10 @@ function versionCompare(sources, dests) {
 if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
     let today = new Date(Date.now()).toDateString();
     if (localStorage.getItem("last_updated") != today) {
-        setTimeout(function() {
-            let latest = GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name;
+        setTimeout(async () => {
+            let latest = await $.get(`https://api.github.com/repos/${repo}/releases/latest`).tag_name;
             if (versionCompare(latest.slice(1), GM_info.script.header.match(/@version +([^\n]+)\n/)[1]) && confirm(`检测到新版本 ${latest}，是否更新？`)) { // eslint-disable-line no-undef
-                window.location.href = `https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name}/nflsoj-helper.min.user.js`;
+                window.location.href = `https://github.com/${repo}/releases/download/${latest}/nflsoj-helper.min.user.js`;
             }
         }, 0);
         localStorage.setItem("last_updated", today);
@@ -55,9 +52,7 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
 }
 /******************** totalstyle module ********************/
 function betterBorder(p) {
-    p.style.backgroundColor = "rgba(255,255,255)";
-    p.style.padding = "14px";
-    p.style.border = "thin solid rgba(200,200,200,0.5)";
+    p.style.cssText += "backgroundColor:#fff;padding:14px;border:thin solid rgba(200,200,200,0.5)";
 }
 if (/contests|practices/.test(domain)) {
     betterBorder(getElement("padding")[0].children[0]);
@@ -72,26 +67,22 @@ if (String(localStorage.getItem("bgurl")) != "null") {
 document.body.style.backgroundSize = "cover";
 if (!localStorage.getItem("fgopacity")) localStorage.setItem("fgopacity", "0.8");
 document.body.style.opacity = localStorage.getItem("fgopacity");
-Array.from(getElement("ui comments")).forEach(function(value) {
-    value.style.backgroundColor = "#fff";
-    value.style.padding = "1em";
-    value.style.borderRadius = "0.28571429rem";
-    value.style.boxShadow = "0 1px 2px 0 rgb(34 36 38 / 15%)";
-    value.style.border = "1px solid rgba(34,36,38,.15)";
+Array.from(getElement("ui comments")).forEach((value) => {
+    value.style.cssText += "background-color:#fff;padding:1em;border-radius:0.285714rem;box-shadow:0 1px 2px 0 rgb(34 36 38 / 15%);border:1px solid rgba(34,36,38,.15);";
 });
 /******************** copy module ********************/
 function addCopy(button, code) {
-    button.addEventListener("click", function() {
+    button.addEventListener("click", () => {
         GM_setClipboard(code.textContent, "Copy"); // eslint-disable-line no-undef
         button.textContent = "Copied!";
-        setTimeout(function(){button.textContent = "Copy";}, 1000);
+        setTimeout(() => {button.textContent = "Copy";}, 1000);
     })
 }
 function articleAddCopy(button, code) {
-    button.addEventListener("click", function() {
+    button.addEventListener("click", () => {
         GM_setClipboard(code.textContent, "text"); // eslint-disable-line no-undef
         button.lastChild.textContent = "复制成功!";
-        setTimeout(function(){button.lastChild.textContent = "复制";}, 1000);
+        setTimeout(() => {button.lastChild.textContent = "复制";}, 1000);
     })
 }
 let clickCountForCode = 0;
@@ -124,7 +115,7 @@ if (!(/login/.test(domain))) {
                         articleCopy = ownDiscuss ? ownDiscuss.parentNode : getElement("padding")[0].childNodes[5];
                     articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
                                                 <i class="ui copy icon"></i>复制</a>`;
-                    articleAddCopy(articleCopy.lastChild, getDOM(href + "/edit").getElementById("content"));
+                    articleAddCopy(articleCopy.lastChild, await getDOM(href + "/edit").getElementById("content"));
                 }
                 continue;
             }
@@ -135,37 +126,41 @@ if (!(/login/.test(domain))) {
     }
 }
 /******************** userstyle module ********************/
-function getColor(request) {
-    let fir = request.match(/(?<=##)#[0-9a-fA-F]{6}/),
-        res = request.match(/(?<=(?<!#)#)#[0-9a-fA-F]{6}/);
-    res = res ? res[0] : "black";
-    return [fir ? fir[0] : res, res];
-}
 function genColorHTML(t, data, name, color) {
     return `<${t} ${data}><span style="color:${color[0]}">${name[0]}</span><span style="color:${color[1]};">${name.slice(1)}</span></${t}>`;
 }
-function getUserIcon(request) {
-    let icon = request.match(/##\{([\s\S]+ icon)\}/);
-    return icon ? `<i class="${icon[1]}"></i>` : null;
+async function getUserConfig(domain) {
+    let doc = await getDOM(domain), backup = doc.getElementsByClassName("icon")[14].classList.value, config = {
+        nameColor: ["black", "black"],
+        userIcon: /(man|woman) icon/.test(backup) ? backup : ""
+    }
+    let discuss = doc.body.innerHTML.match(/<td><a href="(\/article\/\d+)">\$helper.config<\/a><\/td>/);
+    if (discuss) {
+        discuss = JSON.parse((await getDOM(discuss[1])).getElementById("content").textContent);
+        for (let key in discuss) config[key] = discuss[key];
+    }
+    return config;
 }
 if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
+    let config = await getUserConfig(domain);
     let mainpage = getElement("ui bottom attached segment");
     for (let i = 0; i < mainpage.length; ++i) {
         if (mainpage[i].parentNode.innerText.includes("Email")) {
             document.getElementsByTagName("img")[0].src = `https://cn.gravatar.com/avatar/${md5(mainpage[i].innerText)}?s=324.183`; // eslint-disable-line no-undef
         }
     }
-    let nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, getColor(mainpage[3].innerHTML)),
-        backup = getElement("icon")[14].outerHTML, customIcon = getUserIcon(mainpage[3].innerHTML);
+    let nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, config.nameColor), customIcon = `<i class="${config.userIcon}"></i>`;
     mainpage[0].innerHTML = nameColor;
-    getElement("header")[1].innerHTML = nameColor + " " + (customIcon ? customIcon : /(man|woman) icon/.test(backup) ? backup : "");
+    getElement("header")[1].innerHTML = nameColor + " " + customIcon;
 } else if (domain == "/") {
-    for (let i = 0; i < 20; ++i) {
-        let td = getElement("ui very basic center aligned table")[0].tBodies[0].children[i], name = td.children[1].innerText;
-        td.children[1].innerHTML = genColorHTML(
-            "a", `href=${td.children[1].children[0].getAttribute("href")}`, name,
-            getColor(td.childNodes[9].textContent));
-    }
+    setTimeout(async () => {
+        let rank = getElement("ui very basic center aligned table")[0].tBodies[0].children,
+            res = await Promise.all(Array.from({length: rank.length}, (v, i) => rank[i]).map(async i => {
+                let td = i, name = td.children[1].innerText, config = await getUserConfig(td.children[1].children[0].getAttribute("href"));
+                return genColorHTML("a", `href=${td.children[1].children[0].getAttribute("href")}`, name, config.nameColor);
+            }));
+        for (let i = 0; i < rank.length; ++i) rank[i].children[1].innerHTML = res[i];
+    }, 0);
 }
 /******************** rating module ********************/
 function getEloWinProbability(ra, rb) {
@@ -228,11 +223,11 @@ async function Rating() {
     const hisRating = getElement("ui center aligned header")[0].innerText + `<\\/td>[\\s\\S]*?(<td>\\d{4}[\\s\\S]*?<\\/td>)`,
           curRating = /<i class="star icon"><\/i>积分 (\d+)/;
     let arr = document.getElementsByTagName("tbody")[0].rows, c = Array.from({length: arr.length}, (v, i) => i);
-    c = GET(arr[0].innerHTML.match(/\/user\/\d+/)[0]).match(hisRating) != null
-        ? await Promise.all(c.map(async i => (await $.get(arr[i].innerHTML.match(/\/user\/\d+/)[0])).match(hisRating)[1])) // eslint-disable-line no-undef
+    c = (await $.get(arr[0].innerHTML.match(/\/user\/\d+/)[0])).match(hisRating) != null
+        ? await Promise.all(c.map(async i => (await $.get(arr[i].innerHTML.match(/\/user\/\d+/)[0])).match(hisRating)[1]))
         : calcRating(await Promise.all(c.map(async i => ({
             rank: arr[i].children[0].innerText,
-            currentRating: parseInt((await $.get(arr[i].innerHTML.match(/\/user\/\d+/)[0])).match(curRating)[1]) // eslint-disable-line no-undef
+            currentRating: parseInt((await $.get(arr[i].innerHTML.match(/\/user\/\d+/)[0])).match(curRating)[1])
         })))).map(p => {
             let n = Math.round(p.rank);
             return `<td>${Math.round(p.currentRating)}<span class="rating_${n >= 0 ? "up" : "down"}">(${(n < 0 ? "" : "+") + n})</span></td>`;
@@ -248,7 +243,7 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
     if (head.innerHTML.indexOf("用户名") == -1) {
         let arr = document.getElementsByTagName("tbody")[0].rows;
         let name = await Promise.all(Array.from({length: arr.length}, (v, i) => i).map(async (i) => {
-            let raw = await $.get(arr[i].innerHTML.match(/\/submission\/\d+/)[0]); // eslint-disable-line no-undef
+            let raw = await $.get(arr[i].innerHTML.match(/\/submission\/\d+/)[0]);
             return `<td><a href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`;
         }));
         head.innerHTML = head.innerHTML.slice(0, pos) + "<th>用户名</th>" + head.innerHTML.slice(pos);
@@ -260,7 +255,7 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
     if (/ranklist/.test(domain)) {
         getElement("padding")[0].innerHTML = `<span class="ui mini right floated labeled blue icon button" id="rating" style="top:6px;"><i class="calculator icon" id=calc></i><text>Predict Rating</text></span>`
             + getElement("padding")[0].innerHTML;
-        document.getElementById("rating").addEventListener("click", async function() {
+        document.getElementById("rating").addEventListener("click", async () => {
             getElement("padding")[0].children[0].children[1].innerText = "Please Wait...";
             await Rating();
             getElement("padding")[0].children[0].children[1].innerText = "Done!";
@@ -302,18 +297,18 @@ if (domain == "/") {
         </td></tr>
       </table>
     </div>` + col.innerHTML.slice(ind);
-    document.getElementById("l1").addEventListener("click", function() {
+    document.getElementById("l1").addEventListener("click", () => {
         localStorage.setItem("disable_auto_update", document.getElementById("l1").checked ? "N" : "Y");
         if (document.getElementById("l1").checked) localStorage.removeItem("last_updated");
     });
-    document.getElementById("l2").addEventListener("click", function() {
-        window.location.href = `https://github.com/${repo}/releases/download/${GET(`https://api.github.com/repos/${repo}/releases/latest`).tag_name}/nflsoj-helper.min.user.js`;
+    document.getElementById("l2").addEventListener("click", async () => {
+        window.location.href = `https://github.com/${repo}/releases/download/${await $.get(`https://api.github.com/repos/${repo}/releases/latest`).tag_name}/nflsoj-helper.min.user.js`; // eslint-disable-line no-undef
     });
-    document.getElementById("f1").addEventListener("click", function() {
+    document.getElementById("f1").addEventListener("click", () => {
         document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
         alert("Success");
     });
-    document.getElementById("f2").addEventListener("click", function() {
+    document.getElementById("f2").addEventListener("click", () => {
         localStorage.setItem("bgurl", prompt("请输入背景链接，想删除背景选择“取消”，默认图片由GlaceonVGC提供", `https://raw.githubusercontent.com/${repo}/master/images/471.jpg`));
         document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
         alert("Success");
