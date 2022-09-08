@@ -136,7 +136,7 @@ async function getUserConfig(domain) {
     }
     let discuss = doc.body.innerHTML.match(/<td><a href="(\/article\/\d+)">\$helper.config<\/a><\/td>/);
     if (discuss) {
-        discuss = JSON.parse((await getDOM(discuss[1])).getElementById("content").textContent);
+        discuss = JSON.parse((await getDOM(discuss[1] + "/edit")).getElementById("content").textContent);
         for (let key in discuss) config[key] = discuss[key];
     }
     return config;
@@ -155,9 +155,11 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
 } else if (domain == "/") {
     setTimeout(async () => {
         let rank = getElement("ui very basic center aligned table")[0].tBodies[0].children,
-            res = await Promise.all(Array.from({length: rank.length}, (v, i) => rank[i]).map(async i => {
-                let td = i, name = td.children[1].innerText, config = await getUserConfig(td.children[1].children[0].getAttribute("href"));
-                return genColorHTML("a", `href=${td.children[1].children[0].getAttribute("href")}`, name, config.nameColor);
+            res = await Promise.all(Array.from({length: rank.length}, (v, i) => rank[i]).map(async td => {
+                const href = td.children[1].children[0].getAttribute("href"), name = td.children[1].innerText;
+                td.children[1].innerHTML = genColorHTML("a", `href=${href}`, name, ["black", "black"]);
+                let config = await getUserConfig(href);
+                return genColorHTML("a", `href=${href}`, name, config.nameColor);
             }));
         for (let i = 0; i < rank.length; ++i) rank[i].children[1].innerHTML = res[i];
     }, 0);
