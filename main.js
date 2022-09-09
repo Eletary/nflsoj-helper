@@ -42,7 +42,7 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
     let today = new Date(Date.now()).toDateString();
     if (localStorage.getItem("last_updated") != today) {
         setTimeout(async () => {
-            let latest = await $.get(`https://api.github.com/repos/${repo}/releases/latest`).tag_name;
+            let latest = (await $.get(`https://api.github.com/repos/${repo}/releases/latest`)).tag_name;
             if (versionCompare(latest.slice(1), GM_info.script.header.match(/@version +([^\n]+)\n/)[1]) && confirm(`检测到新版本 ${latest}，是否更新？`)) { // eslint-disable-line no-undef
                 window.location.href = `https://github.com/${repo}/releases/download/${latest}/nflsoj-helper.min.user.js`;
             }
@@ -115,7 +115,7 @@ if (!(/login/.test(domain))) {
                         articleCopy = ownDiscuss ? ownDiscuss.parentNode : getElement("padding")[0].childNodes[5];
                     articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
                                                 <i class="ui copy icon"></i>复制</a>`;
-                    articleAddCopy(articleCopy.lastChild, await getDOM(href + "/edit").getElementById("content"));
+                    articleAddCopy(articleCopy.lastChild, (await getDOM(href + "/edit")).getElementById("content"));
                 }
                 continue;
             }
