@@ -96,7 +96,7 @@ if (/^\/article\/\d+(?!\/edit)/.test(domain)) {
             </p>
             <div class="ui existing segment">
 	          <div id="content" class="font-content"><div style="position: relative; overflow: hidden; transform: translate3d(0, 0, 0); ">
-                ${await $.post("http://www.nfls.com.cn:20035/api/markdown","s="+article.getElementById("content").textContent)}
+                ${await $.post("http://www.nfls.com.cn:20035/api/v2/markdown","s="+article.getElementById("content").value.replaceAll("+", "%2B"))}
               </div>
             </div>
         </div></div>`;
