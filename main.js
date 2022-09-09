@@ -70,19 +70,48 @@ document.body.style.opacity = localStorage.getItem("fgopacity");
 Array.from(getElement("ui comments")).forEach((value) => {
     value.style.cssText += "background-color:#fff;padding:1em;border-radius:0.285714rem;box-shadow:0 1px 2px 0 rgb(34 36 38 / 15%);border:1px solid rgba(34,36,38,.15);";
 });
+/******************** discuss module ********************/
+function articleAddCopy(button, code) {
+    button.addEventListener("click", () => {
+        GM_setClipboard(code.textContent, "text"); // eslint-disable-line no-undef
+        button.lastChild.textContent = "复制成功!";
+        setTimeout(() => {button.lastChild.textContent = "复制";}, 1000);
+    })
+}
+if (/^\/article\/\d+(?!\/edit)/.test(domain)) {
+    let href = domain.match(/\/article\/\d+/)[0];
+    let article = (await getDOM(href + "/edit"));
+    if (document.body.innerHTML.includes("您没有权限进行此操作。")) {
+        getElement("ui main container")[0].innerHTML = `
+        <div class="padding"><div class="ui breadcrumb">
+            <div class="section">讨论</div>
+              <i class="right angle icon divider"></i>
+              <div class="section">Helper Discuss Show</div>
+            </div>
+            <h1>${article.getElementById("title").value}</h1>
+ 	        <p style="margin-bottom: -5px; ">
+	          <img style="vertical-align: middle; margin-bottom: 2px; margin-right: 2px; " src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" width="17" height="17">
+	          <b style="margin-right: 30px; "><a class="black-link">nflsoj-helper</a></b>
+	          <b style="margin-right: 30px; "><i class="calendar icon"></i> 2077-08-04 1:00:00</b>
+            </p>
+            <div class="ui existing segment">
+	          <div id="content" class="font-content"><div style="position: relative; overflow: hidden; transform: translate3d(0, 0, 0); ">${article.getElementById("content").textContent}</div>
+            </div>
+        </div></div>`;
+        document.title = article.getElementById("title").value + " - NFLSOJ";
+    }
+    let ownDiscuss = getElement("ui mini right floated labeled icon button")[1],
+        articleCopy = ownDiscuss ? ownDiscuss.parentNode : getElement("padding")[0].children[2];
+    articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
+                                <i class="ui copy icon"></i>复制</a>`;
+    articleAddCopy(articleCopy.lastChild, article.getElementById("content"));
+}
 /******************** copy module ********************/
 function addCopy(button, code) {
     button.addEventListener("click", () => {
         GM_setClipboard(code.textContent, "Copy"); // eslint-disable-line no-undef
         button.textContent = "Copied!";
         setTimeout(() => {button.textContent = "Copy";}, 1000);
-    })
-}
-function articleAddCopy(button, code) {
-    button.addEventListener("click", () => {
-        GM_setClipboard(code.textContent, "text"); // eslint-disable-line no-undef
-        button.lastChild.textContent = "复制成功!";
-        setTimeout(() => {button.lastChild.textContent = "复制";}, 1000);
     })
 }
 let clickCountForCode = 0;
@@ -108,17 +137,7 @@ if (!(/login/.test(domain))) {
         } else {
         for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
             if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
-            else if (e[i].firstChild.localName != "pre") {
-                let href = domain.match(/\/article\/\d+/)[0];
-                if (href) {
-                    let ownDiscuss = getElement("ui mini right floated labeled icon button")[1],
-                        articleCopy = ownDiscuss ? ownDiscuss.parentNode : getElement("padding")[0].childNodes[5];
-                    articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
-                                                <i class="ui copy icon"></i>复制</a>`;
-                    articleAddCopy(articleCopy.lastChild, (await getDOM(href + "/edit")).getElementById("content"));
-                }
-                continue;
-            }
+            else if (e[i].firstChild.localName != "pre") continue;
             e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
                                  Copy</div>`;
             addCopy(e[i].lastChild, e[i].childNodes[0]);
@@ -246,7 +265,7 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
         let arr = document.getElementsByTagName("tbody")[0].rows;
         let name = await Promise.all(Array.from({length: arr.length}, (v, i) => i).map(async (i) => {
             let raw = await $.get(arr[i].innerHTML.match(/\/submission\/\d+/)[0]);
-            return `<td><a href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`;
+            return `<td><a style="color:black;"href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`;
         }));
         head.innerHTML = head.innerHTML.slice(0, pos) + "<th>用户名</th>" + head.innerHTML.slice(pos);
         for (let i = 0; i < arr.length; ++i) {
@@ -255,12 +274,13 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
         }
     }
     if (/ranklist/.test(domain)) {
-        getElement("padding")[0].innerHTML = `<span class="ui mini right floated labeled blue icon button" id="rating" style="top:6px;"><i class="calculator icon" id=calc></i><text>Predict Rating</text></span>`
+        getElement("padding")[0].innerHTML =
+              `<span class="ui mini right floated labeled blue icon button" id="rating" style="top:6px;"><i class="calculator icon" id=calc></i>Predict Rating</span>`
             + getElement("padding")[0].innerHTML;
         document.getElementById("rating").addEventListener("click", async () => {
-            getElement("padding")[0].children[0].children[1].innerText = "Please Wait...";
+            getElement("padding")[0].children[0].childNodes[1].innerText = "Please Wait...";
             await Rating();
-            getElement("padding")[0].children[0].children[1].innerText = "Done!";
+            getElement("padding")[0].children[0].childNodes[1].innerText = "Done!";
         });
     }
 }
