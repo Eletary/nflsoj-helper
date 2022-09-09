@@ -13,7 +13,7 @@
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // ==/UserScript==
-/* global $ */
+/* global $, marked */
 
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper"; // white
@@ -80,7 +80,7 @@ function articleAddCopy(button, code) {
 }
 if (/^\/article\/\d+(?!\/edit)/.test(domain)) {
     let href = domain.match(/\/article\/\d+/)[0];
-    let article = (await getDOM(href + "/edit"));
+    let article = await getDOM(href + "/edit");
     if (document.body.innerHTML.includes("您没有权限进行此操作。")) {
         getElement("ui main container")[0].innerHTML = `
         <div class="padding"><div class="ui breadcrumb">
@@ -95,7 +95,9 @@ if (/^\/article\/\d+(?!\/edit)/.test(domain)) {
 	          <b style="margin-right: 30px; "><i class="calendar icon"></i> 2077-08-04 1:00:00</b>
             </p>
             <div class="ui existing segment">
-	          <div id="content" class="font-content"><div style="position: relative; overflow: hidden; transform: translate3d(0, 0, 0); ">${article.getElementById("content").textContent}</div>
+	          <div id="content" class="font-content"><div style="position: relative; overflow: hidden; transform: translate3d(0, 0, 0); ">
+                ${await $.post("http://www.nfls.com.cn:20035/api/markdown","s="+article.getElementById("content").textContent)}
+              </div>
             </div>
         </div></div>`;
         document.title = article.getElementById("title").value + " - NFLSOJ";
@@ -149,7 +151,7 @@ function genColorHTML(t, data, name, color) {
     return `<${t} ${data}><span style="color:${color[0]}">${name[0]}</span><span style="color:${color[1]};">${name.slice(1)}</span></${t}>`;
 }
 async function getUserConfig(domain) {
-    let doc = await getDOM(domain), backup = doc.getElementsByClassName("icon")[14].classList.value, config = {
+    let doc = await getDOM(domain), backup = doc.getElementsByClassName("icon")[13].classList.value, config = {
         nameColor: ["black", "black"],
         userIcon: /(man|woman) icon/.test(backup) ? backup : ""
     }
