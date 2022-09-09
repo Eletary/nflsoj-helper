@@ -304,7 +304,7 @@ if (domain == "/") {
         if (document.getElementById("l1").checked) localStorage.removeItem("last_updated");
     });
     document.getElementById("l2").addEventListener("click", async () => {
-        window.location.href = `https://github.com/${repo}/releases/download/${await $.get(`https://api.github.com/repos/${repo}/releases/latest`).tag_name}/nflsoj-helper.min.user.js`; // eslint-disable-line no-undef
+        window.location.href = `https://github.com/${repo}/releases/download/${(await $.get(`https://api.github.com/repos/${repo}/releases/latest`)).tag_name}/nflsoj-helper.min.user.js`; // eslint-disable-line no-undef
     });
     document.getElementById("f1").addEventListener("click", () => {
         document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
