@@ -13,10 +13,9 @@
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // ==/UserScript==
-/* global $, marked */
+/* global $ */
 
-
-const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper"; // white
+const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper";
 async function getDOM(href) {
     return new DOMParser().parseFromString(await $.get(href), "text/html");
 }
