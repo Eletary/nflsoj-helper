@@ -194,7 +194,7 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
     let mainpage = getElement("ui bottom attached segment");
     for (let i = 0; i < mainpage.length; ++i) {
         if (mainpage[i].parentNode.innerText.includes("Email")) {
-            document.getElementsByTagName("img")[0].src = `https://cn.gravatar.com/avatar/${md5(mainpage[i].innerText)}?s=324.183`; // eslint-disable-line no-undef
+            document.getElementsByTagName("img")[0].src = `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=324.183&d=mp`; // eslint-disable-line no-undef
         }
     }
     let nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, config.nameColor), customIcon = `<i class="${config.userIcon}"></i>`;
