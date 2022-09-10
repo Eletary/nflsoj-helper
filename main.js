@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NFLSOJ Helper
 // @namespace    https://github.com/NFLSCode/nflsoj-helper
-// @version      1.4.1
+// @version      VERSION
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match        *://www.nfls.com.cn:20035/*
@@ -79,7 +79,7 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
 }
 /******************** totalstyle module ********************/
 function betterBorder(p) {
-    p.style.cssText += "background-color:#ffffff;padding:14px;border:thin solid rgba(200,200,200,0.5)";
+    p.style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,0.5)";
 }
 if (/contests|practices/.test(domain)) {
     betterBorder(getElement("padding")[0].children[0]);
@@ -91,8 +91,7 @@ if (/contests|practices/.test(domain)) {
 if (String(localStorage.getItem("bgurl")) != "null") {
     document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
 }
-document.body.style.backgroundSize = "cover";
-document.body.style.backgroundAttachment="fixed";
+document.body.style.cssText += "background-size:cover;background-attachment:fixed;";
 if (!localStorage.getItem("fgopacity")) localStorage.setItem("fgopacity", "0.8");
 document.body.style.opacity = localStorage.getItem("fgopacity");
 Array.from(getElement("ui comments")).forEach((value) => {
