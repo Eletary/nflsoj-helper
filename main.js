@@ -96,6 +96,7 @@ if (/^\/article\/\d+(?!\/edit)/.test(domain)) {
     let href = domain.match(/\/article\/\d+/)[0];
     let article = await getDOM(href + "/edit");
     if (document.body.innerHTML.includes("您没有权限进行此操作。")) {
+        document.body.innerHTML = document.body.innerHTML.replace("您没有权限进行此操作。", "Loading article …");
         getElement("ui main container")[0].innerHTML = `
         <div class="padding"><div class="ui breadcrumb">
             <div class="section">讨论</div>
@@ -138,7 +139,7 @@ function formatCode() {
     value.children[0].children[1].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
 }
 if (!(/login/.test(domain))) {
-    if (/^\/submission\/\d+(\/|$)/.test(domain)) {
+    if (/\/submission\/\d+/.test(domain) && document.body.innerText.includes("格式化代码")) {
         let value = getElement("ui existing segment")[0];
         value.firstChild.style.borderRadius = "0 .28571429rem 0 0";
         value.firstChild.style.position = "unset";
@@ -151,12 +152,12 @@ if (!(/login/.test(domain))) {
         addCopy(value.firstChild.children[0], value.lastChild);
         value.children[0].children[1].addEventListener("click", formatCode);
         } else {
-        for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
-            if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
-            else if (e[i].firstChild.localName != "pre") continue;
-            e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
+            for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
+                if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
+                else if (e[i].children[0].localName != "pre") continue;
+                e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
                                  Copy</div>`;
-            addCopy(e[i].lastChild, e[i].childNodes[0]);
+                addCopy(e[i].lastChild, e[i].children[0]);
         }
     }
 }
