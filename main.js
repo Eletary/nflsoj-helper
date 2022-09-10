@@ -173,9 +173,13 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
     mainpage[0].innerHTML = nameColor;
     getElement("header")[1].innerHTML = nameColor + " " + customIcon;
 } else if (domain == "/") {
+    document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
     setTimeout(async () => {
-        let rank = getElement("ui very basic center aligned table")[0].tBodies[0].children,
-            res = await Promise.all(Array.from({length: rank.length}, (v, i) => rank[i]).map(async td => {
+        let rank = getElement("ui very basic center aligned table")[0].tBodies[0].children;
+        for (let i = 0; i < rank.length; ++i) window.eval(rank[i].childNodes[9].children[0].innerHTML); // eslint-disable-line no-eval
+        getElement("ui very basic center aligned table")[0].tHead.children[0].children[1].style.width = "170px";
+        getElement("ui very basic center aligned table")[0].tHead.children[0].innerHTML += "<th>个性签名</th>";
+        let res = await Promise.all(Array.from({length: rank.length}, (v, i) => rank[i]).map(async td => {
                 const href = td.children[1].children[0].getAttribute("href"), name = td.children[1].innerText;
                 td.children[1].innerHTML = genColorHTML("a", `href=${href}`, name, ["black", "black"]);
                 let config = await getUserConfig(href);
