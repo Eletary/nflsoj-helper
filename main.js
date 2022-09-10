@@ -22,6 +22,32 @@ async function getDOM(href) {
 function getElement(request) {
     return document.getElementsByClassName(request);
 }
+document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
+/******************** userfind module ********************/
+getElement("right floated five wide column")[0].children[0].innerHTML = `<i class="search icon"></i>查找用户`;
+getElement("right floated five wide column")[0].children[1].innerHTML = `
+          <div class="ui search focus" style="width: 100%; ">
+            <div class="ui left icon input" style="width: 100%; ">
+              <input class="prompt" style="width: 100%; " type="text" placeholder="ID / 用户名 …">
+              <i class="search icon"></i>
+            </div>
+            <div class="results" style="width: 100%; "></div>
+          </div>`;
+let script = document.createElement("script");
+script.innerHTML = `
+$(function () {
+  $('.ui.search').search({
+    debug: true,
+    apiSettings: {
+      url: '/api/v2/search/users/{query}',
+      cache: false
+    },
+    fields: {
+      title: 'name'
+    }
+  });
+});`;
+getElement("right floated five wide column")[0].appendChild(script);
 /******************** subscribe module ********************/
 function versionCompare(sources, dests) {
     sources = sources.split('.');
@@ -173,7 +199,6 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
     mainpage[0].innerHTML = nameColor;
     getElement("header")[1].innerHTML = nameColor + " " + customIcon;
 } else if (domain == "/") {
-    document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
     setTimeout(async () => {
         let rank = getElement("ui very basic center aligned table")[0].tBodies[0].children;
         for (let i = 0; i < rank.length; ++i) window.eval(rank[i].childNodes[9].children[0].innerHTML); // eslint-disable-line no-eval
