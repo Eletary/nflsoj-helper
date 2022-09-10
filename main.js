@@ -22,7 +22,7 @@ async function getDOM(href) {
 function getElement(request) {
     return document.getElementsByClassName(request);
 }
-document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
+if (domain == "/") document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
 /******************** userfind module ********************/
 getElement("right floated five wide column")[0].children[0].innerHTML = `<i class="search icon"></i>查找用户`;
 getElement("right floated five wide column")[0].children[1].innerHTML = `
