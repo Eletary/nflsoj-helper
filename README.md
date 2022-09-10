@@ -19,4 +19,6 @@
 
 ## How to use it
 
-Just add script [`main.js`](main.js) into your tampermonkey.
+First, download [tampermonkey](https://www.tampermonkey.net). Then, click `nflsoj-helper.min.user.js` [here](https://github.com/NFLSCode/nflsoj-helper/releases/latest).
+
+Enjoy!
