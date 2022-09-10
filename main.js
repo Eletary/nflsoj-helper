@@ -24,8 +24,9 @@ function getElement(request) {
 }
 if (domain == "/") document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
 /******************** userfind module ********************/
-getElement("right floated five wide column")[0].children[0].innerHTML = `<i class="search icon"></i>查找用户`;
-getElement("right floated five wide column")[0].children[1].innerHTML = `
+if (domain == "/") {
+    getElement("right floated five wide column")[0].children[0].innerHTML = `<i class="search icon"></i>查找用户`;
+    getElement("right floated five wide column")[0].children[1].innerHTML = `
           <div class="ui search focus" style="width: 100%; ">
             <div class="ui left icon input" style="width: 100%; ">
               <input class="prompt" style="width: 100%; " type="text" placeholder="ID / 用户名 …">
@@ -33,21 +34,22 @@ getElement("right floated five wide column")[0].children[1].innerHTML = `
             </div>
             <div class="results" style="width: 100%; "></div>
           </div>`;
-let script = document.createElement("script");
-script.innerHTML = `
-$(function () {
-  $('.ui.search').search({
-    debug: true,
-    apiSettings: {
-      url: '/api/v2/search/users/{query}',
-      cache: false
-    },
-    fields: {
-      title: 'name'
-    }
-  });
-});`;
-getElement("right floated five wide column")[0].appendChild(script);
+    let script = document.createElement("script");
+    script.innerHTML = `
+    $(function () {
+      $('.ui.search').search({
+        debug: true,
+        apiSettings: {
+          url: '/api/v2/search/users/{query}',
+          cache: false
+        },
+        fields: {
+          title: 'name'
+        }
+      });
+    });`;
+    getElement("right floated five wide column")[0].appendChild(script);
+}
 /******************** subscribe module ********************/
 function versionCompare(sources, dests) {
     sources = sources.split('.');
