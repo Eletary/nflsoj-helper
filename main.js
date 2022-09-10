@@ -13,7 +13,7 @@
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // ==/UserScript==
-/* global $ */
+/* eslint-disable no-undef */
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper";
 async function getDOM(href) {
@@ -22,14 +22,14 @@ async function getDOM(href) {
 function getElement(request) {
     return document.getElementsByClassName(request);
 }
-if (domain == "/") document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
 /******************** userfind module ********************/
 if (domain == "/") {
+    document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
     getElement("right floated five wide column")[0].children[0].innerHTML = `<i class="search icon"></i>查找用户`;
     getElement("right floated five wide column")[0].children[1].innerHTML = `
           <div class="ui search focus" style="width: 100%; ">
             <div class="ui left icon input" style="width: 100%; ">
-              <input class="prompt" style="width: 100%; " type="text" placeholder="ID / 用户名 …">
+              <input class="prompt" style="width: 100%;" type="text" placeholder="ID / 用户名 …">
               <i class="search icon"></i>
             </div>
             <div class="results" style="width: 100%; "></div>
@@ -39,13 +39,8 @@ if (domain == "/") {
     $(function () {
       $('.ui.search').search({
         debug: true,
-        apiSettings: {
-          url: '/api/v2/search/users/{query}',
-          cache: false
-        },
-        fields: {
-          title: 'name'
-        }
+        apiSettings: {url: '/api/v2/search/users/{query}', cache: false},
+        fields: {title: 'name'}
       });
     });`;
     getElement("right floated five wide column")[0].appendChild(script);
@@ -60,8 +55,7 @@ function versionCompare(sources, dests) {
             preNum = isNaN(Number(preValue)) ? preValue.charCodeAt() : Number(preValue),
             lastValue = dests.length > i ? dests[i] : 0,
             lastNum = isNaN(Number(lastValue)) ? lastValue.charCodeAt() : Number(lastValue);
-        if (preNum < lastNum) return false;
-        if (preNum > lastNum) return true;
+        if (preNum != lastNum) return preNum > lastNum;
     }
     return false;
 }
@@ -70,7 +64,7 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
     if (localStorage.getItem("last_updated") != today) {
         setTimeout(async () => {
             let latest = (await $.get(`https://api.github.com/repos/${repo}/releases/latest`)).tag_name;
-            if (versionCompare(latest.slice(1), GM_info.script.header.match(/@version +([^\n]+)\n/)[1]) && confirm(`检测到新版本 ${latest}，是否更新？`)) { // eslint-disable-line no-undef
+            if (versionCompare(latest.slice(1), GM_info.script.header.match(/@version +([^\n]+)\n/)[1]) && confirm(`检测到新版本 ${latest}，是否更新？`)) {
                 window.location.href = `https://github.com/${repo}/releases/download/${latest}/nflsoj-helper.min.user.js`;
             }
         }, 0);
@@ -78,16 +72,9 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
     }
 }
 /******************** totalstyle module ********************/
-function betterBorder(p) {
-    p.style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,0.5)";
-}
-if (/contests|practices/.test(domain)) {
-    betterBorder(getElement("padding")[0].children[0]);
-} else if (/submissions|\d+\/ranklist|repeat|discussion/.test(domain)) {
-    betterBorder(getElement("padding")[0].children[1]);
-} else if (/cp/.test(domain)) {
-    betterBorder(getElement("fixed-table-body")[0]);
-}
+(/contests|practices/.test(domain) ? getElement("padding")[0].children[0] :
+/submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? getElement("padding")[0].children[1] :
+/cp/.test(domain) ? getElement("fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
 if (String(localStorage.getItem("bgurl")) != "null") {
     document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
 }
@@ -100,7 +87,7 @@ Array.from(getElement("ui comments")).forEach((value) => {
 /******************** discuss module ********************/
 function articleAddCopy(button, code) {
     button.addEventListener("click", () => {
-        GM_setClipboard(code.textContent, "text"); // eslint-disable-line no-undef
+        GM_setClipboard(code.textContent, "text");
         button.lastChild.textContent = "复制成功!";
         setTimeout(() => {button.lastChild.textContent = "复制";}, 1000);
     })
@@ -116,10 +103,10 @@ if (/^\/article\/\d+(?!\/edit)/.test(domain)) {
               <div class="section">Helper Discuss Show</div>
             </div>
             <h1>${article.getElementById("title").value}</h1>
- 	        <p style="margin-bottom: -5px; ">
-	          <img style="vertical-align: middle; margin-bottom: 2px; margin-right: 2px; " src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" width="17" height="17">
-	          <b style="margin-right: 30px; "><a class="black-link">nflsoj-helper</a></b>
-	          <b style="margin-right: 30px; "><i class="calendar icon"></i> 2077-08-04 1:00:00</b>
+ 	        <p style="margin-bottom:-5px;">
+	          <img style="vertical-align:middle;margin-bottom:2px;margin-right:2px;" src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" width="17" height="17">
+	          <b style="margin-right:30px;"><a class="black-link">nflsoj-helper</a></b>
+	          <b style="margin-right:30px;"><i class="calendar icon"></i> 2077-08-04 1:00:00</b>
             </p>
             <div class="ui existing segment">
 	          <div id="content" class="font-content"><div style="position: relative; overflow: hidden; transform: translate3d(0, 0, 0); ">
@@ -138,7 +125,7 @@ if (/^\/article\/\d+(?!\/edit)/.test(domain)) {
 /******************** copy module ********************/
 function addCopy(button, code) {
     button.addEventListener("click", () => {
-        GM_setClipboard(code.textContent, "Copy"); // eslint-disable-line no-undef
+        GM_setClipboard(code.textContent, "Copy");
         button.textContent = "Copied!";
         setTimeout(() => {button.textContent = "Copy";}, 1000);
     })
@@ -147,7 +134,7 @@ let clickCountForCode = 0;
 function formatCode() {
     clickCountForCode ^= 1;
     let value = getElement("ui existing segment")[0];
-    value.children[1].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode; // eslint-disable-line no-undef
+    value.children[1].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode;
     value.children[0].children[1].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
 }
 if (!(/login/.test(domain))) {
@@ -194,7 +181,7 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
     let mainpage = getElement("ui bottom attached segment");
     for (let i = 0; i < mainpage.length; ++i) {
         if (mainpage[i].parentNode.innerText.includes("Email")) {
-            document.getElementsByTagName("img")[0].src = `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=324.183&d=mp`; // eslint-disable-line no-undef
+            document.getElementsByTagName("img")[0].src = `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=324.183&d=mp`;
         }
     }
     let nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, config.nameColor), customIcon = `<i class="${config.userIcon}"></i>`;
@@ -222,11 +209,7 @@ function getEloWinProbability(ra, rb) {
 function getContestantSeed(contestantIndex, allContestants) {
     let seed = 1;
     let rating = allContestants[contestantIndex].currentRating;
-    for (let i = 0; i < allContestants.length; i++) {
-        if (contestantIndex != i) {
-            seed += getEloWinProbability(allContestants[i].currentRating, rating);
-        }
-    }
+    for (let i = 0; i < allContestants.length; i++) if (contestantIndex != i) seed += getEloWinProbability(allContestants[i].currentRating, rating);
     return seed;
 }
 function sum(arr) {
@@ -269,7 +252,10 @@ function calcRating(allContestants) {
     const deltaSum2 = sum(deltas.slice(0, zeroSumCount));
     const inc2 = Math.min(Math.max(-deltaSum2 / zeroSumCount, -10), 0);
     deltas = deltas.map(d => d + inc2);
-    return allContestants.map((contestant, i) => ({rank: deltas[i], currentRating: contestant.currentRating + deltas[i]}));
+    return allContestants.map((contestant, i) => {
+        let n = Math.round(deltas[i]);
+        return `<td>${Math.round(contestant.currentRating + n)}<span class="rating_${n >= 0 ? "up" : "down"}">(${(n < 0 ? "" : "+") + n})</span></td>`;
+    });
 }
 async function Rating() {
     if (document.getElementsByTagName("thead")[0].rows[0].innerHTML.includes("<th>Rating(Δ)</th>")) return ;
@@ -281,14 +267,9 @@ async function Rating() {
         : calcRating(await Promise.all(c.map(async i => ({
             rank: arr[i].children[0].innerText,
             currentRating: parseInt((await $.get(arr[i].innerHTML.match(/\/user\/\d+/)[0])).match(curRating)[1])
-        })))).map(p => {
-            let n = Math.round(p.rank);
-            return `<td>${Math.round(p.currentRating)}<span class="rating_${n >= 0 ? "up" : "down"}">(${(n < 0 ? "" : "+") + n})</span></td>`;
-        });
+        }))));
     document.getElementsByTagName("thead")[0].rows[0].innerHTML += "<th>Rating(Δ)</th>";
-    for (let i = 0; i < arr.length; ++i) {
-        arr[i].innerHTML += c[i];
-    }
+    for (let i = 0; i < arr.length; ++i) arr[i].innerHTML += c[i];
 }
 /******************** rank module ********************/
 if (/\d+\/(ranklist|repeat)/.test(domain)) {
@@ -309,10 +290,10 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
         getElement("padding")[0].innerHTML =
               `<span class="ui mini right floated labeled blue icon button" id="rating" style="top:6px;"><i class="calculator icon" id=calc></i>Predict Rating</span>`
             + getElement("padding")[0].innerHTML;
-        document.getElementById("rating").addEventListener("click", async () => {
-            getElement("padding")[0].children[0].childNodes[1].innerText = "Please Wait...";
+        rating.addEventListener("click", async () => {
+            rating.childNodes[1].data = "Please Wait...";
             await Rating();
-            getElement("padding")[0].children[0].childNodes[1].innerText = "Done!";
+            rating.childNodes[1].data = "Done!";
         });
     }
 }
@@ -321,8 +302,7 @@ if (domain == "/") {
     let col = getElement("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
     col.innerHTML = col.innerHTML.slice(0, ind) + `
     <h4 class="ui top attached block header">
-      <img src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" style="width:20px;height:20px;position:relative;top:-3px;">
-      NFLSOJ Helper 控制面板
+      <img src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" style="width:20px;height:20px;position:relative;top:-3px;">NFLSOJ Helper 控制面板
     </h4>
     <div class="ui bottom attached segment">
       <table class="ui very basic table" style="table-layout: fixed;">
@@ -351,18 +331,18 @@ if (domain == "/") {
         </td></tr>
       </table>
     </div>` + col.innerHTML.slice(ind);
-    document.getElementById("l1").addEventListener("click", () => {
-        localStorage.setItem("disable_auto_update", document.getElementById("l1").checked ? "N" : "Y");
-        if (document.getElementById("l1").checked) localStorage.removeItem("last_updated");
+    l1.addEventListener("click", () => {
+        localStorage.setItem("disable_auto_update", l1.checked ? "N" : "Y");
+        if (l1.checked) localStorage.removeItem("last_updated");
     });
-    document.getElementById("l2").addEventListener("click", async () => {
-        window.location.href = `https://github.com/${repo}/releases/download/${(await $.get(`https://api.github.com/repos/${repo}/releases/latest`)).tag_name}/nflsoj-helper.min.user.js`; // eslint-disable-line no-undef
+    l2.addEventListener("click", async () => {
+        window.location.href = `https://github.com/${repo}/releases/download/${(await $.get(`https://api.github.com/repos/${repo}/releases/latest`)).tag_name}/nflsoj-helper.min.user.js`;
     });
-    document.getElementById("f1").addEventListener("click", () => {
+    f1.addEventListener("click", () => {
         document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
         alert("Success");
     });
-    document.getElementById("f2").addEventListener("click", () => {
+    f2.addEventListener("click", () => {
         localStorage.setItem("bgurl", prompt("请输入背景链接，想删除背景选择“取消”，默认图片由GlaceonVGC提供", `https://raw.githubusercontent.com/${repo}/master/images/471.jpg`));
         document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
         alert("Success");
