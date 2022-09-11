@@ -92,7 +92,7 @@ function articleAddCopy(button, code) {
         setTimeout(() => {button.lastChild.textContent = "复制";}, 1000);
     })
 }
-if (/^\/article\/\d+(?!\/edit)/.test(domain)) {
+if (/article\/\d+(?=\/(?!e)|$)/.test(domain)) {
     let href = domain.match(/\/article\/\d+/)[0];
     let article = await getDOM(href + "/edit");
     if (document.body.innerHTML.includes("您没有权限进行此操作。")) {
