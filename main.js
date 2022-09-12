@@ -152,7 +152,7 @@ if (/article\/\d+(?=\/(?!e)|$)/.test(domain)) {
             </p>
             <div class="ui existing segment">
 	          <div id="content" class="font-content"><div style="position: relative; overflow: hidden; transform: translate3d(0, 0, 0); ">
-                ${await $.post("http://www.nfls.com.cn:20035/api/v2/markdown","s="+article.getElementById("content").value.replaceAll("+", "%2B").replaceAll("&", "%26"))}
+                ${await $.post("http://www.nfls.com.cn:20035/api/v2/markdown","s=" + encodeURIComponent(article.getElementById("content").value))}
               </div>
             </div>
         </div></div>`;
@@ -297,7 +297,7 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
         let arr = document.getElementsByTagName("tbody")[0].rows;
         let name = await Promise.all(Array.from({length: arr.length}, (v, i) => i).map(async (i) => {
             let raw = await $.get(arr[i].innerHTML.match(/\/submission\/\d+/)[0]);
-            return `<td><a style="color:black;"href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`;
+            return `<td><a href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`;
         }));
         head.innerHTML = head.innerHTML.slice(0, pos) + "<th>用户名</th>" + head.innerHTML.slice(pos);
         for (let i = 0; i < arr.length; ++i) {
