@@ -14,6 +14,7 @@
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // ==/UserScript==
 /* eslint-disable no-undef */
+/* eslint-disable curly */
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper";
 async function getDOM(href) {
@@ -71,9 +72,8 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
         localStorage.setItem("last_updated", today);
     }
 }
-/******************** totalstyle module ********************/
-(/contests|practices/.test(domain) ? getElement("padding")[0].children[0] :
-/submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? getElement("padding")[0].children[1] :
+/******************** style module ********************/
+(/contests|practices|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? getElement("ui very basic center aligned table")[0] :
 /cp/.test(domain) ? getElement("fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
 if (String(localStorage.getItem("bgurl")) != "null") {
     document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
@@ -81,87 +81,9 @@ if (String(localStorage.getItem("bgurl")) != "null") {
 document.body.style.cssText += "background-size:cover;background-attachment:fixed;";
 if (!localStorage.getItem("fgopacity")) localStorage.setItem("fgopacity", "0.8");
 document.body.style.opacity = localStorage.getItem("fgopacity");
-Array.from(getElement("ui comments")).forEach((value) => {
+Array.from($(".ui.comments")).forEach((value) => {
     value.style.cssText += "background-color:#fff;padding:1em;border-radius:0.285714rem;box-shadow:0 1px 2px 0 rgb(34 36 38 / 15%);border:1px solid rgba(34,36,38,.15);";
 });
-/******************** discuss module ********************/
-function articleAddCopy(button, code) {
-    button.addEventListener("click", () => {
-        GM_setClipboard(code.textContent, "text");
-        button.lastChild.textContent = "复制成功!";
-        setTimeout(() => {button.lastChild.textContent = "复制";}, 1000);
-    })
-}
-if (/article\/\d+(?=\/(?!e)|$)/.test(domain)) {
-    let href = domain.match(/\/article\/\d+/)[0];
-    let article = await getDOM(href + "/edit");
-    if (document.body.innerHTML.includes("您没有权限进行此操作。")) {
-        document.body.innerHTML = document.body.innerHTML.replace("您没有权限进行此操作。", "Loading article …");
-        getElement("ui main container")[0].innerHTML = `
-        <div class="padding"><div class="ui breadcrumb">
-            <div class="section">讨论</div>
-              <i class="right angle icon divider"></i>
-              <div class="section">Helper Discuss Show</div>
-            </div>
-            <h1>${article.getElementById("title").value}</h1>
- 	        <p style="margin-bottom:-5px;">
-	          <img style="vertical-align:middle;margin-bottom:2px;margin-right:2px;" src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" width="17" height="17">
-	          <b style="margin-right:30px;"><a class="black-link">nflsoj-helper</a></b>
-	          <b style="margin-right:30px;"><i class="calendar icon"></i> 2077-08-04 1:00:00</b>
-            </p>
-            <div class="ui existing segment">
-	          <div id="content" class="font-content"><div style="position: relative; overflow: hidden; transform: translate3d(0, 0, 0); ">
-                ${await $.post("http://www.nfls.com.cn:20035/api/v2/markdown","s="+article.getElementById("content").value.replaceAll("+", "%2B"))}
-              </div>
-            </div>
-        </div></div>`;
-        document.title = article.getElementById("title").value + " - NFLSOJ";
-    }
-    let ownDiscuss = getElement("ui mini right floated labeled icon button")[1],
-        articleCopy = ownDiscuss ? ownDiscuss.parentNode : getElement("padding")[0].children[2];
-    articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
-                                <i class="ui copy icon"></i>复制</a>`;
-    articleAddCopy(articleCopy.lastChild, article.getElementById("content"));
-}
-/******************** copy module ********************/
-function addCopy(button, code) {
-    button.addEventListener("click", () => {
-        GM_setClipboard(code.textContent, "Copy");
-        button.textContent = "Copied!";
-        setTimeout(() => {button.textContent = "Copy";}, 1000);
-    })
-}
-let clickCountForCode = 0;
-function formatCode() {
-    clickCountForCode ^= 1;
-    let value = getElement("ui existing segment")[0];
-    value.children[1].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode;
-    value.children[0].children[1].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
-}
-if (!(/login/.test(domain))) {
-    if (/\/submission\/\d+/.test(domain) && document.body.innerText.includes("格式化代码")) {
-        let value = getElement("ui existing segment")[0];
-        value.firstChild.style.borderRadius = "0 .28571429rem 0 0";
-        value.firstChild.style.position = "unset";
-        let position = value.innerHTML.search(/<\/a>/) + 4;
-        value.innerHTML = `<span style="position:absolute;top:0px;right:-4px;">
-                             <div class="ui button" style="position:relative;left:4px;border-right:1px solid rgba(0,0,0,0.6);border-radius:0 0 0 .28571429rem;">
-                               Copy
-                             </div>${value.innerHTML.slice(0, position)}
-                           </span>${value.innerHTML.slice(position)}`;
-        addCopy(value.firstChild.children[0], value.lastChild);
-        value.children[0].children[1].addEventListener("click", formatCode);
-        } else {
-            for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
-                if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
-                else if (e[i].children[0].localName != "pre") continue;
-                e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
-                                 Copy</div>`;
-                addCopy(e[i].lastChild, e[i].children[0]);
-        }
-    }
-}
-/******************** userstyle module ********************/
 function genColorHTML(t, data, name, color) {
     return `<${t} ${data}><span style="color:${color[0]}">${name[0]}</span><span style="color:${color[1]};">${name.slice(1)}</span></${t}>`;
 }
@@ -202,6 +124,102 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
             }));
         for (let i = 0; i < rank.length; ++i) rank[i].children[1].innerHTML = res[i];
     }, 0);
+}
+/******************** discuss module ********************/
+function articleAddCopy(button, code) {
+    button.addEventListener("click", () => {
+        GM_setClipboard(code.textContent, "text");
+        button.lastChild.textContent = "复制成功!";
+        setTimeout(() => {button.lastChild.textContent = "复制";}, 1000);
+    })
+}
+if (/article\/\d+(?=\/(?!e)|$)/.test(domain)) {
+    let href = domain.match(/\/article\/\d+/)[0];
+    let article = await getDOM(href + "/edit");
+    if (document.body.innerHTML.includes("您没有权限进行此操作。")) {
+        document.body.innerHTML = document.body.innerHTML.replace("您没有权限进行此操作。", "Loading article …");
+        getElement("ui main container")[0].innerHTML = `
+        <div class="padding"><div class="ui breadcrumb">
+            <div class="section">讨论</div>
+              <i class="right angle icon divider"></i>
+              <div class="section">Helper Discuss Show</div>
+            </div>
+            <h1>${article.getElementById("title").value}</h1>
+ 	        <p style="margin-bottom:-5px;">
+	          <img style="vertical-align:middle;margin-bottom:2px;margin-right:2px;" src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" width="17" height="17">
+	          <b style="margin-right:30px;"><a class="black-link">nflsoj-helper</a></b>
+	          <b style="margin-right:30px;"><i class="calendar icon"></i> 2077-08-04 1:00:00</b>
+            </p>
+            <div class="ui existing segment">
+	          <div id="content" class="font-content"><div style="position: relative; overflow: hidden; transform: translate3d(0, 0, 0); ">
+                ${await $.post("http://www.nfls.com.cn:20035/api/v2/markdown","s="+article.getElementById("content").value.replaceAll("+", "%2B").replaceAll("&", "%26"))}
+              </div>
+            </div>
+        </div></div>`;
+        document.title = article.getElementById("title").value + " - NFLSOJ";
+    }
+    let ownDiscuss = getElement("ui mini right floated labeled icon button")[1],
+        articleCopy = ownDiscuss ? ownDiscuss.parentNode : getElement("padding")[0].children[2];
+    articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
+                                <i class="ui copy icon"></i>复制</a>`;
+    articleAddCopy(articleCopy.lastChild, article.getElementById("content"));
+}
+/******************** BZOJ module ********************/
+if (/problem/.test(domain)) {
+    let value = getElement("ui grid")[1];
+    if (value.children[1].children[0].children[1].innerText == "题目描述") {
+        let bzoj = (await getDOM(value.children[1].getElementsByTagName("a")[0].href)).getElementsByClassName("ui grid")[1];
+        bzoj.innerHTML = bzoj.innerHTML.replaceAll("upload/", "/bzoj/JudgeOnline/upload/");
+        bzoj = bzoj.children;
+        let p = "";
+        for (let i = 1; i < bzoj.length; ++i)
+            if (!/^\s*$/.test(bzoj[i].children[0].children[1].innerText))
+                p += bzoj[i].outerHTML;
+        value.innerHTML = value.innerHTML.slice(0, value.innerHTML.indexOf(`</div>\n  \n  <div class="row">`) + 12) + p + value.innerHTML.slice(
+            value.innerHTML.indexOf("数据范围与提示") == -1 ? value.innerHTML.indexOf(`return submit_code()`) - 176 : value.innerHTML.indexOf("数据范围与提示") - 98
+        );
+        let script = document.createElement("script");
+        script.innerText = document.getElementsByTagName("script")[15].innerText;
+        document.body.appendChild(script);
+    }
+}
+/******************** copy module ********************/
+function addCopy(button, code) {
+    button.addEventListener("click", () => {
+        GM_setClipboard(code.textContent, "Copy");
+        button.textContent = "Copied!";
+        setTimeout(() => {button.textContent = "Copy";}, 1000);
+    })
+}
+let clickCountForCode = 0;
+function formatCode() {
+    clickCountForCode ^= 1;
+    let value = getElement("ui existing segment")[0];
+    value.children[1].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode;
+    value.children[0].children[1].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
+}
+if (!(/login/.test(domain))) {
+    if (/\/submission\/\d+/.test(domain) && document.body.innerText.includes("格式化代码")) {
+        let value = getElement("ui existing segment")[0];
+        value.firstChild.style.borderRadius = "0 .28571429rem 0 0";
+        value.firstChild.style.position = "unset";
+        let position = value.innerHTML.search(/<\/a>/) + 4;
+        value.innerHTML = `<span style="position:absolute;top:0px;right:-4px;">
+                             <div class="ui button" style="position:relative;left:4px;border-right:1px solid rgba(0,0,0,0.6);border-radius:0 0 0 .28571429rem;">
+                               Copy
+                             </div>${value.innerHTML.slice(0, position)}
+                           </span>${value.innerHTML.slice(position)}`;
+        addCopy(value.firstChild.children[0], value.lastChild);
+        value.children[0].children[1].addEventListener("click", formatCode);
+        } else {
+            for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
+                if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
+                else if (e[i].children[0].localName != "pre") continue;
+                e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
+                                 Copy</div>`;
+                addCopy(e[i].lastChild, e[i].children[0]);
+        }
+    }
 }
 /******************** rating module ********************/
 function getEloWinProbability(ra, rb) {
