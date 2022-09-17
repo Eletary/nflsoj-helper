@@ -20,14 +20,11 @@ const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper";
 async function getDOM(href) {
     return new DOMParser().parseFromString(await $.get(href), "text/html");
 }
-function getElement(request) {
-    return document.getElementsByClassName(request);
-}
 /******************** userfind module ********************/
 if (domain == "/") {
     document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
-    getElement("right floated five wide column")[0].children[0].innerHTML = `<i class="search icon"></i>查找用户`;
-    getElement("right floated five wide column")[0].children[1].innerHTML = `
+    $(".right.floated.five.wide.column")[0].children[0].innerHTML = `<i class="search icon"></i>查找用户`;
+    $(".right.floated.five.wide.column")[0].children[1].innerHTML = `
           <div class="ui search focus" style="width: 100%; ">
             <div class="ui left icon input" style="width: 100%; ">
               <input class="prompt" style="width: 100%;" type="text" placeholder="ID / 用户名 …">
@@ -44,7 +41,7 @@ if (domain == "/") {
         fields: {title: 'name'}
       });
     });`;
-    getElement("right floated five wide column")[0].appendChild(script);
+    document.getElementsByClassName("right floated five wide column")[0].appendChild(script);
 }
 /******************** subscribe module ********************/
 function versionCompare(sources, dests) {
@@ -73,8 +70,8 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
     }
 }
 /******************** style module ********************/
-(/contests|practices|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? getElement("ui very basic center aligned table")[0] :
-/cp/.test(domain) ? getElement("fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
+(/contests|practices|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0] :
+/cp/.test(domain) ? $("fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
 if (String(localStorage.getItem("bgurl")) != "null") {
     document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
 }
@@ -101,21 +98,23 @@ async function getUserConfig(domain) {
 }
 if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
     let config = await getUserConfig(domain);
-    let mainpage = getElement("ui bottom attached segment");
-    for (let i = 0; i < mainpage.length; ++i) {
-        if (mainpage[i].parentNode.innerText.includes("Email")) {
-            document.getElementsByTagName("img")[0].src = `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=324.183&d=mp`;
-        }
-    }
+    let mainpage = $(".attached.segment");
     let nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, config.nameColor), customIcon = `<i class="${config.userIcon}"></i>`;
     mainpage[0].innerHTML = nameColor;
-    getElement("header")[1].innerHTML = nameColor + " " + customIcon;
+    $("header")[1].innerHTML = nameColor + " " + customIcon;
+    try {
+        for (let i = 0; i < mainpage.length; ++i)
+            if (mainpage[i].parentNode.innerText.includes("Email"))
+                document.getElementsByTagName("img")[0].src = `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=324.183&d=mp`;
+    } catch {
+        console.error("style.email: require network connection");
+    }
 } else if (domain == "/") {
     setTimeout(async () => {
-        let rank = getElement("ui very basic center aligned table")[0].tBodies[0].children;
+        let rank = $(".aligned.table")[0].tBodies[0].children;
         for (let i = 0; i < rank.length; ++i) window.eval(rank[i].childNodes[9].children[0].innerHTML); // eslint-disable-line no-eval
-        getElement("ui very basic center aligned table")[0].tHead.children[0].children[1].style.width = "170px";
-        getElement("ui very basic center aligned table")[0].tHead.children[0].innerHTML += "<th>个性签名</th>";
+        $(".aligned.table")[0].tHead.children[0].children[1].style.width = "170px";
+        $(".aligned.table")[0].tHead.children[0].innerHTML += "<th>个性签名</th>";
         let res = await Promise.all(Array.from({length: rank.length}, (v, i) => rank[i]).map(async td => {
                 const href = td.children[1].children[0].getAttribute("href"), name = td.children[1].innerText;
                 td.children[1].innerHTML = genColorHTML("a", `href=${href}`, name, ["black", "black"]);
@@ -138,7 +137,7 @@ if (/article\/\d+(?=\/(?!e)|$)/.test(domain)) {
     let article = await getDOM(href + "/edit");
     if (document.body.innerHTML.includes("您没有权限进行此操作。")) {
         document.body.innerHTML = document.body.innerHTML.replace("您没有权限进行此操作。", "Loading article …");
-        getElement("ui main container")[0].innerHTML = `
+        $(".main.container")[0].innerHTML = `
         <div class="padding"><div class="ui breadcrumb">
             <div class="section">讨论</div>
               <i class="right angle icon divider"></i>
@@ -152,21 +151,21 @@ if (/article\/\d+(?=\/(?!e)|$)/.test(domain)) {
             </p>
             <div class="ui existing segment">
 	          <div id="content" class="font-content"><div style="position: relative; overflow: hidden; transform: translate3d(0, 0, 0); ">
-                ${await $.post("http://www.nfls.com.cn:20035/api/v2/markdown","s=" + encodeURIComponent(article.getElementById("content").value))}
+                ${await $.post("/api/v2/markdown","s=" + encodeURIComponent(article.getElementById("content").value))}
               </div>
             </div>
         </div></div>`;
         document.title = article.getElementById("title").value + " - NFLSOJ";
     }
-    let ownDiscuss = getElement("ui mini right floated labeled icon button")[1],
-        articleCopy = ownDiscuss ? ownDiscuss.parentNode : getElement("padding")[0].children[2];
+    let ownDiscuss = $(".floated.labeled.icon.button")[1],
+        articleCopy = ownDiscuss ? ownDiscuss.parentNode : $(".padding")[0].children[2];
     articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
                                 <i class="ui copy icon"></i>复制</a>`;
     articleAddCopy(articleCopy.lastChild, article.getElementById("content"));
 }
 /******************** BZOJ module ********************/
 if (/problem/.test(domain)) {
-    let value = getElement("ui grid")[1];
+    let value = $(".ui.grid")[1];
     if (value.children[1].children[0].children[1].innerText == "题目描述") {
         let bzoj = (await getDOM(value.children[1].getElementsByTagName("a")[0].href)).getElementsByClassName("ui grid")[1];
         bzoj.innerHTML = bzoj.innerHTML.replaceAll("upload/", "/bzoj/JudgeOnline/upload/");
@@ -194,13 +193,13 @@ function addCopy(button, code) {
 let clickCountForCode = 0;
 function formatCode() {
     clickCountForCode ^= 1;
-    let value = getElement("ui existing segment")[0];
+    let value = $(".existing.segment")[0];
     value.children[1].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode;
     value.children[0].children[1].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
 }
 if (!(/login/.test(domain))) {
     if (/\/submission\/\d+/.test(domain) && document.body.innerText.includes("格式化代码")) {
-        let value = getElement("ui existing segment")[0];
+        let value = $(".existing.segment")[0];
         value.firstChild.style.borderRadius = "0 .28571429rem 0 0";
         value.firstChild.style.position = "unset";
         let position = value.innerHTML.search(/<\/a>/) + 4;
@@ -212,7 +211,7 @@ if (!(/login/.test(domain))) {
         addCopy(value.firstChild.children[0], value.lastChild);
         value.children[0].children[1].addEventListener("click", formatCode);
         } else {
-            for (let i = 0, e; i < (e = getElement("ui existing segment")).length; i++) {
+            for (let i = 0, e; i < (e = $(".existing.segment")).length; i++) {
                 if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
                 else if (e[i].children[0].localName != "pre") continue;
                 e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
@@ -278,7 +277,7 @@ function calcRating(allContestants) {
 }
 async function Rating() {
     if (document.getElementsByTagName("thead")[0].rows[0].innerHTML.includes("<th>Rating(Δ)</th>")) return ;
-    const hisRating = getElement("ui center aligned header")[0].innerText + `<\\/td>[\\s\\S]*?(<td>\\d{4}[\\s\\S]*?<\\/td>)`,
+    const hisRating = $(".center.aligned.header")[0].innerText + `<\\/td>[\\s\\S]*?(<td>\\d{4}[\\s\\S]*?<\\/td>)`,
           curRating = /<i class="star icon"><\/i>积分 (\d+)/;
     let arr = document.getElementsByTagName("tbody")[0].rows, c = Array.from({length: arr.length}, (v, i) => i);
     c = (await $.get(arr[0].innerHTML.match(/\/user\/\d+/)[0])).match(hisRating) != null
@@ -306,9 +305,9 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
         }
     }
     if (/ranklist/.test(domain)) {
-        getElement("padding")[0].innerHTML =
+        $(".padding")[0].innerHTML =
               `<span class="ui mini right floated labeled blue icon button" id="rating" style="top:6px;"><i class="calculator icon" id=calc></i>Predict Rating</span>`
-            + getElement("padding")[0].innerHTML;
+            + $(".padding")[0].innerHTML;
         rating.addEventListener("click", async () => {
             rating.childNodes[1].data = "Please Wait...";
             await Rating();
@@ -318,7 +317,7 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
 }
 /******************** dashboard ********************/
 if (domain == "/") {
-    let col = getElement("eleven wide column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
+    let col = $(".eleven.wide.column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
     col.innerHTML = col.innerHTML.slice(0, ind) + `
     <h4 class="ui top attached block header">
       <img src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" style="width:20px;height:20px;position:relative;top:-3px;">NFLSOJ Helper 控制面板
