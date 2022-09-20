@@ -101,7 +101,7 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
     let mainpage = $(".attached.segment");
     let nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, config.nameColor), customIcon = `<i class="${config.userIcon}"></i>`;
     mainpage[0].innerHTML = nameColor;
-    $("header")[1].innerHTML = nameColor + " " + customIcon;
+    $(".header")[1].innerHTML = nameColor + " " + customIcon;
     try {
         for (let i = 0; i < mainpage.length; ++i)
             if (mainpage[i].parentNode.innerText.includes("Email"))
@@ -177,9 +177,13 @@ if (/problem/.test(domain)) {
         value.innerHTML = value.innerHTML.slice(0, value.innerHTML.indexOf(`</div>\n  \n  <div class="row">`) + 12) + p + value.innerHTML.slice(
             value.innerHTML.indexOf("数据范围与提示") == -1 ? value.innerHTML.indexOf(`return submit_code()`) - 176 : value.innerHTML.indexOf("数据范围与提示") - 98
         );
-        let script = document.createElement("script");
-        script.innerText = document.getElementsByTagName("script")[15].innerText;
-        document.body.appendChild(script);
+        try {
+            let script = document.createElement("script");
+            script.innerText = document.getElementsByTagName("script")[15].innerText;
+            document.body.appendChild(script);
+        } catch {
+            console.log("No need to load code editor.");
+        }
     }
 }
 /******************** copy module ********************/
