@@ -113,7 +113,7 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
     setTimeout(async () => {
         let rank = $(".aligned.table")[0].tBodies[0].children;
         for (let i = 0; i < rank.length; ++i) window.eval(rank[i].childNodes[9].children[0].innerHTML); // eslint-disable-line no-eval
-        $(".aligned.table")[0].tHead.children[0].children[1].style.width = "170px";
+        $(".aligned.table")[0].tHead.children[0].children[1].style.width = "140px";
         $(".aligned.table")[0].tHead.children[0].innerHTML += "<th>个性签名</th>";
         let res = await Promise.all(Array.from({length: rank.length}, (v, i) => rank[i]).map(async td => {
                 const href = td.children[1].children[0].getAttribute("href"), name = td.children[1].innerText;
@@ -170,9 +170,9 @@ if (/problem/.test(domain)) {
         let bzoj = (await getDOM(value.children[1].getElementsByTagName("a")[0].href)).getElementsByClassName("ui grid")[1];
         bzoj.innerHTML = bzoj.innerHTML.replaceAll("upload/", "/bzoj/JudgeOnline/upload/");
         bzoj = bzoj.children;
-        let p = "";
+        let p = value.children[1].outerHTML;
         for (let i = 1; i < bzoj.length; ++i)
-            if (!/^\s*$/.test(bzoj[i].children[0].children[1].innerText))
+            if (!/^\s*$/.test(bzoj[i].children[0].children[1].innerText) || /img/.test(bzoj[i].innerHTML))
                 p += bzoj[i].outerHTML;
         value.innerHTML = value.innerHTML.slice(0, value.innerHTML.indexOf(`</div>\n  \n  <div class="row">`) + 12) + p + value.innerHTML.slice(
             value.innerHTML.indexOf("数据范围与提示") == -1 ? value.innerHTML.indexOf(`return submit_code()`) - 176 : value.innerHTML.indexOf("数据范围与提示") - 98
