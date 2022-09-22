@@ -216,8 +216,8 @@ if (!(/login/.test(domain))) {
         value.children[0].children[1].addEventListener("click", formatCode);
         } else {
             for (let i = 0, e; i < (e = $(".existing.segment")).length; i++) {
-                if (/\/problem\//.test(domain)) e[i].parentNode.style.width = "50%";
-                else if (e[i].children[0].localName != "pre") continue;
+                if (e[i].children[0].localName != "pre") continue;
+                if (/\/problem\//.test(domain) && e[i].parentNode.style.overflow != "hidden") e[i].parentNode.style.width = "50%";
                 e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
                                  Copy</div>`;
                 addCopy(e[i].lastChild, e[i].children[0]);
