@@ -69,61 +69,6 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
         localStorage.setItem("last_updated", today);
     }
 }
-/******************** style module ********************/
-(/contests|practices|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0] :
-/cp/.test(domain) ? $("fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
-if (String(localStorage.getItem("bgurl")) != "null") {
-    document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
-}
-document.body.style.cssText += "background-size:cover;background-attachment:fixed;";
-if (!localStorage.getItem("fgopacity")) localStorage.setItem("fgopacity", "0.8");
-document.body.style.opacity = localStorage.getItem("fgopacity");
-Array.from($(".ui.comments")).forEach((value) => {
-    value.style.cssText += "background-color:#fff;padding:1em;border-radius:0.285714rem;box-shadow:0 1px 2px 0 rgb(34 36 38 / 15%);border:1px solid rgba(34,36,38,.15);";
-});
-function genColorHTML(t, data, name, color) {
-    return `<${t} ${data}><span style="color:${color[0]}">${name[0]}</span><span style="color:${color[1]};">${name.slice(1)}</span></${t}>`;
-}
-async function getUserConfig(domain) {
-    let doc = await getDOM(domain), backup = doc.getElementsByClassName("icon")[13].classList.value, config = {
-        nameColor: ["black", "black"],
-        userIcon: /(man|woman) icon/.test(backup) ? backup : ""
-    }
-    let discuss = doc.body.innerHTML.match(/<td><a href="(\/article\/\d+)">\$helper.config<\/a><\/td>/);
-    if (discuss) {
-        discuss = JSON.parse((await getDOM(discuss[1] + "/edit")).getElementById("content").textContent);
-        for (let key in discuss) config[key] = discuss[key];
-    }
-    return config;
-}
-if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
-    let config = await getUserConfig(domain);
-    let mainpage = $(".attached.segment");
-    let nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, config.nameColor), customIcon = `<i class="${config.userIcon}"></i>`;
-    mainpage[0].innerHTML = nameColor;
-    $(".header")[1].innerHTML = nameColor + " " + customIcon;
-    try {
-        for (let i = 0; i < mainpage.length; ++i)
-            if (mainpage[i].parentNode.innerText.includes("Email"))
-                document.getElementsByTagName("img")[0].src = `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=324.183&d=mp`;
-    } catch {
-        console.error("style.email: require network connection");
-    }
-} else if (domain == "/") {
-    setTimeout(async () => {
-        let rank = $(".aligned.table")[0].tBodies[0].children;
-        for (let i = 0; i < rank.length; ++i) window.eval(rank[i].childNodes[9].children[0].innerHTML); // eslint-disable-line no-eval
-        $(".aligned.table")[0].tHead.children[0].children[1].style.width = "140px";
-        $(".aligned.table")[0].tHead.children[0].innerHTML += "<th>个性签名</th>";
-        let res = await Promise.all(Array.from({length: rank.length}, (v, i) => rank[i]).map(async td => {
-                const href = td.children[1].children[0].getAttribute("href"), name = td.children[1].innerText;
-                td.children[1].innerHTML = genColorHTML("a", `href=${href}`, name, ["black", "black"]);
-                let config = await getUserConfig(href);
-                return genColorHTML("a", `href=${href}`, name, config.nameColor);
-            }));
-        for (let i = 0; i < rank.length; ++i) rank[i].children[1].innerHTML = res[i];
-    }, 0);
-}
 /******************** discuss module ********************/
 function articleAddCopy(button, code) {
     button.addEventListener("click", () => {
@@ -162,6 +107,75 @@ if (/article\/\d+(?=\/(?!e)|$)/.test(domain)) {
     articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
                                 <i class="ui copy icon"></i>复制</a>`;
     articleAddCopy(articleCopy.lastChild, article.getElementById("content"));
+}
+/******************** style module ********************/
+(/contests|practices|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0] :
+/cp/.test(domain) ? $("fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
+if (String(localStorage.getItem("bgurl")) != "null") {
+    document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
+}
+document.body.style.cssText += "background-size:cover;background-attachment:fixed;";
+if (!localStorage.getItem("fgopacity")) localStorage.setItem("fgopacity", "0.8");
+document.body.style.opacity = localStorage.getItem("fgopacity");
+Array.from($(".ui.comments")).forEach((value) => {
+    value.style.cssText += "background-color:#fff;padding:1em;border-radius:0.285714rem;box-shadow:0 1px 2px 0 rgb(34 36 38 / 15%);border:1px solid rgba(34,36,38,.15);";
+});
+function genColorHTML(t, data, name, color) {
+    return `<${t} ${data}><span style="color:${color[0]}">${name[0]}</span><span style="color:${color[1]};">${name.slice(1)}</span></${t}>`;
+}
+async function getUserConfig(domain) {
+    let doc = await getDOM(domain), backup = doc.getElementsByClassName("icon")[13].classList.value, config = {
+        nameColor: ["black", "black"],
+        userIcon: /(man|woman) icon/.test(backup) ? backup : ""
+    }
+    let discuss = doc.body.innerHTML.match(/<td><a href="(\/article\/\d+)">\$helper.config<\/a><\/td>/);
+    if (discuss) {
+        discuss = JSON.parse((await getDOM(discuss[1] + "/edit")).getElementById("content").textContent);
+        for (let key in discuss) config[key] = discuss[key];
+    }
+    return config;
+}
+async function getEmail(user, size) {
+    let mainpage = (await getDOM(user)).getElementsByClassName("attached segment");
+    for (let i = 0; i < mainpage.length; ++i)
+        if (mainpage[i].parentNode.innerText.includes("Email"))
+            return `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=${size}&d=mp`;
+    return "/self/gravatar.png";
+}
+if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
+    let config = await getUserConfig(domain);
+    let mainpage = $(".attached.segment");
+    let nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, config.nameColor), customIcon = `<i class="${config.userIcon}"></i>`;
+    mainpage[0].innerHTML = nameColor;
+    $(".header")[1].innerHTML = nameColor + " " + customIcon;
+    try {
+        for (let i = 0; i < mainpage.length; ++i)
+            if (mainpage[i].parentNode.innerText.includes("Email"))
+                document.getElementsByTagName("img")[0].src = `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=324.183&d=mp`;
+    } catch {
+        console.error("style.email: require network connection");
+    }
+} else if (/article\/\d+(?=\/(?!e)|$)/.test(domain) && $("img")[0].src.includes("/self/gravatar.png")) {
+    try {
+        $("img")[0].src = await getEmail($("img")[0].parentNode.children[1].children[0].href, 34);
+        Array.from($(".comment")).forEach(async td => {td.getElementsByTagName("img")[0].src = await getEmail(td.getElementsByTagName("a")[1].href, 120)});
+    } catch {
+        console.error("style.email: require network connection");
+    }
+} else if (domain == "/") {
+    setTimeout(async () => {
+        let rank = $(".aligned.table")[0].tBodies[0].children;
+        for (let i = 0; i < rank.length; ++i) window.eval(rank[i].childNodes[9].children[0].innerHTML); // eslint-disable-line no-eval
+        $(".aligned.table")[0].tHead.children[0].children[1].style.width = "140px";
+        $(".aligned.table")[0].tHead.children[0].innerHTML += "<th>个性签名</th>";
+        let res = await Promise.all(Array.from({length: rank.length}, (v, i) => rank[i]).map(async td => {
+                const href = td.children[1].children[0].getAttribute("href"), name = td.children[1].innerText;
+                td.children[1].innerHTML = genColorHTML("a", `href=${href}`, name, ["black", "black"]);
+                let config = await getUserConfig(href);
+                return genColorHTML("a", `href=${href}`, name, config.nameColor);
+            }));
+        for (let i = 0; i < rank.length; ++i) rank[i].children[1].innerHTML = res[i];
+    }, 0);
 }
 /******************** BZOJ module ********************/
 if (/problem/.test(domain)) {
