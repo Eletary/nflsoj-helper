@@ -20,28 +20,42 @@ const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper";
 async function getDOM(href) {
     return new DOMParser().parseFromString(await $.get(href), "text/html");
 }
-/******************** userfind module ********************/
-if (domain == "/") {
-    document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
-    $(".right.floated.five.wide.column")[0].children[0].innerHTML = `<i class="search icon"></i>查找用户`;
-    $(".right.floated.five.wide.column")[0].children[1].innerHTML = `
-          <div class="ui search focus" style="width: 100%; ">
-            <div class="ui left icon input" style="width: 100%; ">
-              <input class="prompt" style="width: 100%;" type="text" placeholder="ID / 用户名 …">
-              <i class="search icon"></i>
-            </div>
-            <div class="results" style="width: 100%; "></div>
-          </div>`;
-    let script = document.createElement("script");
-    script.innerHTML = `
+/******************** search module ********************/
+function genSearchBox(use, id, holder, api) {
+    return [`
+    <h4 class="ui top attached block header"><i class="search icon"></i>${use}</h4>
+    <div class="ui bottom attached segment">
+      <div class="ui search focus" id="${id}" style="width: 100%; ">
+        <div class="ui left icon input" style="width: 100%; ">
+          <input class="prompt" style="width: 100%;" type="text" placeholder="${holder}">
+          <i class="search icon"></i>
+        </div>
+        <div class="results" style="width: 100%; "></div>
+    </div></div>`, `
     $(function () {
-      $('.ui.search').search({
+      $('#${id}').search({
         debug: true,
-        apiSettings: {url: '/api/v2/search/users/{query}', cache: false},
+        apiSettings: {url: '/api/v2/search/${api}/{query}', cache: false},
         fields: {title: 'name'}
       });
-    });`;
-    document.getElementsByClassName("right floated five wide column")[0].appendChild(script);
+    });
+    `];
+}
+if (domain == "/") {
+    document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
+    let mian = $(".right.floated.five.wide.column")[0];
+    let search1 = genSearchBox("查找用户", "user", "ID / 用户名 …", "users"), search2 = genSearchBox("查找题目", "problem", "ID / 题目名 …", "problems");
+    mian.innerHTML = search1[0] + mian.innerHTML;
+    let script = document.createElement("script");
+    script.innerHTML = search1[1];
+    mian.appendChild(script);
+}
+/******************** problemshow module ********************/
+if (/^\/problem\//.test(domain)) {
+    let data = JSON.parse((await getDOM("/article/154/edit")).getElementById("content").textContent);
+    if (data.hasOwnProperty(domain.match(/\d+/)[0])) {
+        window.location.href = data[domain.match(/\d+/)[0]];
+    };
 }
 /******************** subscribe module ********************/
 function versionCompare(sources, dests) {
@@ -62,55 +76,16 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
     if (localStorage.getItem("last_updated") != today) {
         setTimeout(async () => {
             let latest = (await $.get(`https://api.github.com/repos/${repo}/releases/latest`)).tag_name;
-            if (versionCompare(latest.slice(1), GM_info.script.header.match(/@version +([^\n]+)\n/)[1]) && confirm(`检测到新版本 ${latest}，是否更新？`)) {
+            if (versionCompare(latest.slice(1), GM_info.script.version) && confirm(`检测到新版本 ${latest}，是否更新？`)) {
                 window.location.href = `https://github.com/${repo}/releases/download/${latest}/nflsoj-helper.min.user.js`;
             }
         }, 0);
         localStorage.setItem("last_updated", today);
     }
 }
-/******************** discuss module ********************/
-function articleAddCopy(button, code) {
-    button.addEventListener("click", () => {
-        GM_setClipboard(code.textContent, "text");
-        button.lastChild.textContent = "复制成功!";
-        setTimeout(() => {button.lastChild.textContent = "复制";}, 1000);
-    })
-}
-if (/article\/\d+(?=\/(?!e)|$)/.test(domain)) {
-    let href = domain.match(/\/article\/\d+/)[0];
-    let article = await getDOM(href + "/edit");
-    if (document.body.innerHTML.includes("您没有权限进行此操作。")) {
-        document.body.innerHTML = document.body.innerHTML.replace("您没有权限进行此操作。", "Loading article …");
-        $(".main.container")[0].innerHTML = `
-        <div class="padding"><div class="ui breadcrumb">
-            <div class="section">讨论</div>
-              <i class="right angle icon divider"></i>
-              <div class="section">Helper Discuss Show</div>
-            </div>
-            <h1>${article.getElementById("title").value}</h1>
- 	        <p style="margin-bottom:-5px;">
-	          <img style="vertical-align:middle;margin-bottom:2px;margin-right:2px;" src="https://raw.githubusercontent.com/${repo}/master/images/icon.png" width="17" height="17">
-	          <b style="margin-right:30px;"><a class="black-link">nflsoj-helper</a></b>
-	          <b style="margin-right:30px;"><i class="calendar icon"></i> 2077-08-04 1:00:00</b>
-            </p>
-            <div class="ui existing segment">
-	          <div id="content" class="font-content"><div style="position: relative; overflow: hidden; transform: translate3d(0, 0, 0); ">
-                ${await $.post("/api/v2/markdown","s=" + encodeURIComponent(article.getElementById("content").value))}
-              </div>
-            </div>
-        </div></div>`;
-        document.title = article.getElementById("title").value + " - NFLSOJ";
-    }
-    let ownDiscuss = $(".floated.labeled.icon.button")[1],
-        articleCopy = ownDiscuss ? ownDiscuss.parentNode : $(".padding")[0].children[2];
-    articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
-                                <i class="ui copy icon"></i>复制</a>`;
-    articleAddCopy(articleCopy.lastChild, article.getElementById("content"));
-}
 /******************** style module ********************/
 (/contests|practices|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0] :
-/cp/.test(domain) ? $("fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
+/cp/.test(domain) ? $(".fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
 if (String(localStorage.getItem("bgurl")) != "null") {
     document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
 }
@@ -182,7 +157,7 @@ if (/problem/.test(domain)) {
     let value = $(".ui.grid")[1];
     if (value.children[1].children[0].children[1].innerText == "题目描述") {
         let bzoj = (await getDOM(value.children[1].getElementsByTagName("a")[0].href)).getElementsByClassName("ui grid")[1];
-        bzoj.innerHTML = bzoj.innerHTML.replaceAll("upload/", "/bzoj/JudgeOnline/upload/");
+        bzoj.innerHTML = bzoj.innerHTML.replaceAll("upload/", "/bzoj/JudgeOnline/upload/").replaceAll("images/", "/bzoj/JudgeOnline/images/");
         bzoj = bzoj.children;
         let p = value.children[1].outerHTML;
         for (let i = 1; i < bzoj.length; ++i)
@@ -214,6 +189,22 @@ function formatCode() {
     let value = $(".existing.segment")[0];
     value.children[1].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode;
     value.children[0].children[1].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
+}
+function articleAddCopy(button, code) {
+    button.addEventListener("click", () => {
+        GM_setClipboard(code.textContent, "text");
+        button.lastChild.textContent = "复制成功!";
+        setTimeout(() => {button.lastChild.textContent = "复制";}, 1000);
+    })
+}
+if (/article\/\d+(?=\/(?!e)|$)/.test(domain)) {
+    let href = domain.match(/\/article\/\d+/)[0];
+    let article = await getDOM(href + "/edit");
+    let ownDiscuss = $(".floated.labeled.icon.button")[1],
+        articleCopy = ownDiscuss ? ownDiscuss.parentNode : $(".padding")[0].children[2];
+    articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
+                                <i class="ui copy icon"></i>复制</a>`;
+    articleAddCopy(articleCopy.lastChild, article.getElementById("content"));
 }
 if (!(/login/.test(domain))) {
     if (/\/submission\/\d+/.test(domain) && document.body.innerText.includes("格式化代码")) {
@@ -295,7 +286,7 @@ function calcRating(allContestants) {
 }
 async function Rating() {
     if (document.getElementsByTagName("thead")[0].rows[0].innerHTML.includes("<th>Rating(Δ)</th>")) return ;
-    const hisRating = $(".center.aligned.header")[0].innerText + `<\\/td>[\\s\\S]*?(<td>\\d{4}[\\s\\S]*?<\\/td>)`,
+    const hisRating = $(".center.aligned.header")[0].innerText.replaceAll("(", "\\(").replaceAll(")", "\\)") + `<\\/td>[\\s\\S]*?(<td>\\d{4}[\\s\\S]*?<\\/td>)`,
           curRating = /<i class="star icon"><\/i>积分 (\d+)/;
     let arr = document.getElementsByTagName("tbody")[0].rows, c = Array.from({length: arr.length}, (v, i) => i);
     c = (await $.get(arr[0].innerHTML.match(/\/user\/\d+/)[0])).match(hisRating) != null
