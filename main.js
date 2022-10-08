@@ -51,12 +51,12 @@ if (domain == "/") {
     mian.appendChild(script);
 }
 /******************** problemshow module ********************/
-if (/^\/problem\//.test(domain)) {
-    let data = JSON.parse((await getDOM("/article/154/edit")).getElementById("content").textContent);
-    if (data.hasOwnProperty(domain.match(/\d+/)[0])) {
-        window.location.href = data[domain.match(/\d+/)[0]];
-    };
-}
+// if (/^\/problem\//.test(domain)) {
+//     let data = JSON.parse((await getDOM("/article/154/edit")).getElementById("content").textContent);
+//     if (data.hasOwnProperty(domain.match(/\d+/)[0])) {
+//         window.location.href = data[domain.match(/\d+/)[0]];
+//     };
+// }
 /******************** subscribe module ********************/
 function versionCompare(sources, dests) {
     sources = sources.split('.');
