@@ -47,7 +47,7 @@ function genSearchBox(use, id, holder, api) {
 if (domain == "/") {
     document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
     let mian = $(".right.floated.five.wide.column")[0];
-    let search1 = genSearchBox("查找用户", "user", "ID / 用户名 …", "users"), search2 = genSearchBox("查找题目", "problem", "ID / 题目名 …", "problems");
+    let search1 = genSearchBox("查找用户", "user", "ID / 用户名 …", "users");
     mian.innerHTML = search1[0] + mian.innerHTML;
     let script = document.createElement("script");
     script.innerHTML = search1[1];
