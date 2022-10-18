@@ -21,8 +21,8 @@ async function getDOM(href) {
     return new DOMParser().parseFromString(await $.get(href), "text/html");
 }
 /******************** contest module ********************/
-$(".menu")[1].innerHTML += `<a class="item" href="/dp/"><i class="tasks icon"></i>总结</a>`;
-if (/contest\/\d+(?!\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
+if (document.body.innerHTML.includes("我的比赛")) $(".menu")[1].innerHTML += `<a class="item" href="/dp/"><i class="tasks icon"></i>总结</a>`;
+if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
 /******************** search module ********************/
 function genSearchBox(use, id, holder, api) {
     return [`
@@ -48,6 +48,7 @@ if (domain == "/") {
     document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
     let mian = $(".right.floated.five.wide.column")[0];
     let search1 = genSearchBox("查找用户", "user", "ID / 用户名 …", "users");
+    mian.children[0].remove();mian.children[0].remove();
     mian.innerHTML = search1[0] + mian.innerHTML;
     let script = document.createElement("script");
     script.innerHTML = search1[1];
