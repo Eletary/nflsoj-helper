@@ -182,7 +182,7 @@ if (/problem/.test(domain)) {
 /******************** copy module ********************/
 function addCopy(button, code) {
     button.addEventListener("click", () => {
-        GM_setClipboard(code.textContent, "Copy");
+        GM_setClipboard(code.textContent.replaceAll("\n", "\r\n"), "Copy");
         button.textContent = "Copied!";
         setTimeout(() => {button.textContent = "Copy";}, 1000);
     })
