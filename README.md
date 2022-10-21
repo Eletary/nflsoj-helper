@@ -17,6 +17,10 @@
 
 ---
 
+## Before installing
+
+This is a `give-a-star-to-use` repo. Star this repo to use.
+
 ## How to use it
 
 First, download [tampermonkey](https://www.tampermonkey.net). Then, click `nflsoj-helper.min.user.js` [here](https://github.com/NFLSCode/nflsoj-helper/releases/latest).
