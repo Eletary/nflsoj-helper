@@ -94,7 +94,7 @@ if (String(localStorage.getItem("bgurl")) != "null") {
     document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
 }
 document.body.style.cssText += "background-size:cover;background-attachment:fixed;";
-if (!localStorage.getItem("fgopacity")) localStorage.setItem("fgopacity", "0.8");
+if (!localStorage.getItem("fgopacity")) localStorage.setItem("fgopacity", "1.0");
 document.body.style.opacity = localStorage.getItem("fgopacity");
 Array.from($(".ui.comments")).forEach((value) => {
     value.style.cssText += "background-color:#fff;padding:1em;border-radius:0.285714rem;box-shadow:0 1px 2px 0 rgb(34 36 38 / 15%);border:1px solid rgba(34,36,38,.15);";
@@ -374,8 +374,9 @@ if (domain == "/") {
         alert("Success");
     });
     f2.addEventListener("click", () => {
-        localStorage.setItem("bgurl", prompt("请输入背景链接，想删除背景选择“取消”，默认图片由GlaceonVGC提供", `https://raw.githubusercontent.com/${repo}/master/images/471.jpg`));
-        document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
-        alert("Success");
+        let ans = prompt("请输入背景链接，想删除背景选择“取消”，默认图片由GlaceonVGC提供", `https://raw.githubusercontent.com/${repo}/master/images/471.jpg`);
+        localStorage.setItem("bgurl", ans);
+        localStorage.setItem("fgopacity", ans ? 0.8 : 1.0);
+        window.location.reload();
     });
 }
