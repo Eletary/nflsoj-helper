@@ -88,7 +88,7 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
     }
 }
 /******************** style module ********************/
-(/contests|practices|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0] :
+(/contests|practices|statistics|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0] :
 /cp/.test(domain) ? $(".fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
 if (String(localStorage.getItem("bgurl")) != "null") {
     document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
@@ -99,6 +99,9 @@ document.body.style.opacity = localStorage.getItem("fgopacity");
 Array.from($(".ui.comments")).forEach((value) => {
     value.style.cssText += "background-color:#fff;padding:1em;border-radius:0.285714rem;box-shadow:0 1px 2px 0 rgb(34 36 38 / 15%);border:1px solid rgba(34,36,38,.15);";
 });
+if (/dp/.test(domain)){
+    document.getElementsByTagName("table")[0].style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.8)";
+}
 function genColorHTML(t, data, name, color) {
     return `<${t} ${data}><span style="color:${color[0]}">${name[0]}</span><span style="color:${color[1]};">${name.slice(1)}</span></${t}>`;
 }
