@@ -23,7 +23,7 @@ async function getDOM(href) {
 /******************** contest module ********************/
 if (document.body.innerHTML.includes("我的比赛")) $(".menu")[1].innerHTML += `<a class="item" href="/dp/"><i class="tasks icon"></i>总结</a>`;
 if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
-/******************** search module ********************/
+/******************** rightcol module ********************/
 function genSearchBox(use, id, holder, api) {
     return [`
     <h4 class="ui top attached block header"><i class="search icon"></i>${use}</h4>
@@ -44,6 +44,13 @@ function genSearchBox(use, id, holder, api) {
     });
     `];
 }
+async function hitokoto() {
+    let h = await $.get("https://v1.hitokoto.cn/?c=a");
+    return `
+    <div>${h.hitokoto}
+      <div style="margin-top: 14px;text-align: right;font-size: .95em;color: #999;">${"\u2014\u2014"}${h.from}</div>
+    </div>`;
+}
 if (domain == "/") {
     document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
     let mian = $(".right.floated.five.wide.column")[0];
@@ -53,6 +60,24 @@ if (domain == "/") {
     let script = document.createElement("script");
     script.innerHTML = search1[1];
     mian.appendChild(script);
+    try {
+        mian.innerHTML = `
+        <h4 class="ui block top attached header"><i aria-hidden="true" class="comment alternate icon"></i><div class="content">Hitokoto (ヒトコト)
+          <i id="hit" title="Refresh" style="" class="redo icon button"></i></div></h4>
+        <div class="ui bottom attached center aligned segment">${await hitokoto()}</div>
+        <style>
+          #hit {
+            opacity: .2;position: absolute;right: 10px;height: 19px;display: inline-flex;align-items: center;
+          }
+          #hit:hover {
+            opacity: .4;
+          }
+        </style>` + mian.innerHTML;
+        hit.addEventListener("click", async () => {mian.children[1].innerHTML = await hitokoto();});
+    } catch {
+        console.error("rightcol.hitokoto: require network connection");
+    }
+
 }
 /******************** problemshow module ********************/
 // if (/^\/problem\//.test(domain)) {
@@ -293,7 +318,7 @@ function calcRating(allContestants) {
 }
 async function Rating() {
     if (document.getElementsByTagName("thead")[0].rows[0].innerHTML.includes("<th>Rating(Δ)</th>")) return ;
-    const hisRating = $(".center.aligned.header")[0].innerText.replaceAll("(", "\\(").replaceAll(")", "\\)") + `<\\/td>[\\s\\S]*?(<td>\\d{4}[\\s\\S]*?<\\/td>)`,
+    const hisRating = $(".center.aligned.header")[0].innerText.replaceAll("(", "\\(").replaceAll(")", "\\)") + `<\\/td>[\\s\\S]*?(<td>\\d{3,4}[^/]*?<\\/td>)`,
           curRating = /<i class="star icon"><\/i>积分 (\d+)/;
     let arr = document.getElementsByTagName("tbody")[0].rows, c = Array.from({length: arr.length}, (v, i) => i);
     c = (await $.get(arr[0].innerHTML.match(/\/user\/\d+/)[0])).match(hisRating) != null
