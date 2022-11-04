@@ -115,7 +115,7 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
 /******************** style module ********************/
 (/contests|practices|statistics|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0] :
 /cp/.test(domain) ? $(".fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
-if (String(localStorage.getItem("bgurl")) != "null" && document.getElementsByTagName("span")[0].id!='submission_content') {
+if (String(localStorage.getItem("bgurl")) != "null" && document.getElementsByTagName("span")[0].id != 'submission_content') {
     document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
 }
 document.body.style.cssText += "background-size:cover;background-attachment:fixed;";
