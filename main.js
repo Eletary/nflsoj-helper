@@ -16,12 +16,12 @@
 /* eslint-disable no-undef */
 /* eslint-disable curly */
 
-const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper";
+const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", username = $(".dropdown.item")[1].children[0].innerText.slice(0, -1);
 async function getDOM(href) {
     return new DOMParser().parseFromString(await $.get(href), "text/html");
 }
 /******************** contest module ********************/
-if (document.body.innerHTML.includes("我的比赛")) $(".menu")[1].innerHTML += `<a class="item" href="/dp/"><i class="tasks icon"></i>总结</a>`;
+if (document.body.innerHTML.includes("我的比赛")) $(".menu")[1].innerHTML += `<a class="item" href="/summary/?username=${username}"><i class="tasks icon"></i>总结</a>`;
 if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
 /******************** rightcol module ********************/
 function genSearchBox(use, id, holder, api) {
