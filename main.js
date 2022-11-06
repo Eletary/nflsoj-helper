@@ -59,7 +59,6 @@ if (domain == "/") {
     mian.innerHTML = search1[0] + mian.innerHTML;
     let script = document.createElement("script");
     script.innerHTML = search1[1];
-    mian.appendChild(script);
     try {
         mian.innerHTML = `
         <h4 class="ui block top attached header"><i aria-hidden="true" class="comment alternate icon"></i><div class="content">Hitokoto (ヒトコト)
@@ -77,7 +76,7 @@ if (domain == "/") {
     } catch {
         console.error("rightcol.hitokoto: require network connection");
     }
-
+    mian.appendChild(script);
 }
 /******************** problemshow module ********************/
 // if (/^\/problem\//.test(domain)) {
