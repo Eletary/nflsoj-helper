@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NFLSOJ Helper
 // @namespace    https://github.com/NFLSCode/nflsoj-helper
-// @version      VERSION
+// @version      dev
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match        *://www.nfls.com.cn:20035/*
@@ -16,13 +16,18 @@
 /* eslint-disable no-undef */
 /* eslint-disable curly */
 
-const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", username = $(".dropdown.item")[1].children[0].innerText.slice(0, -1);
+const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper";
+try {
+    let username = $(".dropdown.item")[1].children[0].innerText.slice(0, -1);
+    /******************** contest module ********************/
+    if (document.body.innerHTML.includes("我的比赛")) $(".menu")[1].innerHTML += `<a class="item" href="/summary/?username=${username}"><i class="tasks icon"></i>总结</a>`;
+    if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
+} catch {
+    console.info('iframe');
+}
 async function getDOM(href) {
     return new DOMParser().parseFromString(await $.get(href), "text/html");
 }
-/******************** contest module ********************/
-if (document.body.innerHTML.includes("我的比赛")) $(".menu")[1].innerHTML += `<a class="item" href="/summary/?username=${username}"><i class="tasks icon"></i>总结</a>`;
-if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
 /******************** rightcol module ********************/
 function genSearchBox(use, id, holder, api) {
     return [`
@@ -115,7 +120,7 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
 (/contests|practices|statistics|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0] :
 /cp/.test(domain) ? $(".fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
 if (String(localStorage.getItem("bgurl")) != "null" && document.getElementsByTagName("span")[0].id != 'submission_content') {
-    document.body.style.backgroundImage=`url(${localStorage.getItem("bgurl")})`;
+    document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
 }
 document.body.style.cssText += "background-size:cover;background-attachment:fixed;";
 if (!localStorage.getItem("fgopacity")) localStorage.setItem("fgopacity", "1.0");
