@@ -247,16 +247,19 @@ if (/problem/.test(domain)) {
         let bzoj = (await getDOM(value.children[1].getElementsByTagName("a")[0].href)).getElementsByClassName("ui grid")[1];
         bzoj.innerHTML = bzoj.innerHTML.replaceAll("upload/", "/bzoj/JudgeOnline/upload/").replaceAll("images/", "/bzoj/JudgeOnline/images/");
         bzoj = bzoj.children;
-        let p = value.children[1].outerHTML;
+        let p = "";
+        for (let q of [0,1])
+            p += value.children[q].outerHTML;
         for (let i = 1; i < bzoj.length; ++i)
             if (!/^\s*$/.test(bzoj[i].children[0].children[1].innerText) || /img/.test(bzoj[i].innerHTML))
                 p += bzoj[i].outerHTML;
-        value.innerHTML = value.innerHTML.slice(0, value.innerHTML.indexOf(`</div>\n  \n  <div class="row">`) + 12) + p + value.innerHTML.slice(
-            value.innerHTML.indexOf("数据范围与提示") == -1 ? value.innerHTML.indexOf(`return submit_code()`) - 176 : value.innerHTML.indexOf("数据范围与提示") - 98
-        );
+        for (let q of value.children)
+            if (q.innerHTML.includes('数据范围') || q.innerHTML.includes('C++'))
+                p += q.outerHTML;
+        value.innerHTML = p;
         try {
             let script = document.createElement("script");
-            script.innerText = document.getElementsByTagName("script")[15].innerText;
+            script.innerText = document.getElementsByTagName("script")[16].innerText;
             document.body.appendChild(script);
         } catch {
             console.log("No need to load code editor.");
