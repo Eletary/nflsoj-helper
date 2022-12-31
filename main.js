@@ -8,6 +8,7 @@
 // @match        *://192.168.188.77/*
 // @require      http://www.nfls.com.cn:20035/cdnjs/jquery/3.3.1/jquery.min.js
 // @require      http://www.nfls.com.cn:20035/cdnjs/blueimp-md5/2.10.0/js/md5.min.js
+// @require      http://www.nfls.com.cn:20035/cdnjs/semantic-ui/2.4.1/semantic.min.js
 // @grant        GM_setClipboard
 // @grant        GM_info
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
@@ -17,9 +18,52 @@
 /* eslint-disable curly */
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper";
+/******************** prompt module ********************/
+function promptYesOrNo(title, content, f) {
+    document.body.innerHTML += `
+    <div class="ui modal">
+      <div class="header">
+        ${title}
+      </div>
+      <div class="content">
+        <p>${content}</p>
+      </div>
+      <div class="actions">
+        <div class="actions">
+          <div class="ui red deny button">
+            No
+          </div>
+          <div class="ui positive button", id="Agree">
+            Yes
+          </div>
+        </div>
+      </div>
+    </div>`;
+    $('.ui.modal').modal('show');
+    Agree.addEventListener("click", f);
+}
+function promptContent(title, content) {
+    document.body.innerHTML += `
+    <div class="ui modal">
+      <div class="header">
+        ${title}
+      </div>
+      <div class="content">
+        <p>${content}</p>
+      </div>
+      <div class="actions">
+        <div class="actions">
+          <div class="ui positive button">
+            确定
+          </div>
+        </div>
+      </div>
+    </div>`;
+    $('.ui.modal').modal('show');
+}
+/******************** contest module ********************/
 try {
     let username = $(".dropdown.item")[1].children[0].innerText.slice(0, -1);
-    /******************** contest module ********************/
     if (document.body.innerHTML.includes("我的比赛")) $(".menu")[1].innerHTML += `<a class="item" href="/summary/?username=${username}"><i class="tasks icon"></i>总结</a>`;
     if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
 } catch {
@@ -104,16 +148,23 @@ function versionCompare(sources, dests) {
     }
     return false;
 }
+if (localStorage.getItem("show_changelog") != null) {
+    promptContent("更新日志", localStorage.getItem("show_changelog"));
+    localStorage.removeItem("show_changelog");
+}
 if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
     let today = new Date(Date.now()).toDateString();
     if (localStorage.getItem("last_updated") != today) {
+        localStorage.setItem("last_updated", today);
         setTimeout(async () => {
-            let latest = (await $.get(`https://api.github.com/repos/${repo}/releases/latest`)).tag_name;
-            if (versionCompare(latest.slice(1), GM_info.script.version) && confirm(`检测到新版本 ${latest}，是否更新？`)) {
-                window.location.href = `https://github.com/${repo}/releases/download/${latest}/nflsoj-helper.min.user.js`;
+            let latest = await $.get(`https://api.github.com/repos/${repo}/releases/latest`);
+            if (versionCompare(latest.tag_name.slice(1), GM_info.script.version)) {
+                promptYesOrNo("更新提醒", `检测到新版本 ${latest.tag_name}，是否更新？`, async () => {
+                    localStorage.setItem("show_changelog", await $.post("/api/v2/markdown","s=" + encodeURIComponent(`## ${latest.tag_name}\n${latest.body}`)));
+                    window.location.href = `https://github.com/${repo}/releases/download/${latest.tag_name}/nflsoj-helper.min.user.js`;
+                });
             }
         }, 0);
-        localStorage.setItem("last_updated", today);
     }
 }
 /******************** style module ********************/
