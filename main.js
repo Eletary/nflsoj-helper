@@ -19,9 +19,11 @@
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper";
 /******************** prompt module ********************/
+let count = 0;
 function promptYesOrNo(title, content, f) {
+    let id = 'yesorno' + ++count, agree = 'Argee' + count;
     document.body.innerHTML += `
-    <div class="ui modal">
+    <div class="ui modal" id="${id}">
       <div class="header">
         ${title}
       </div>
@@ -33,18 +35,19 @@ function promptYesOrNo(title, content, f) {
           <div class="ui red deny button">
             No
           </div>
-          <div class="ui positive button", id="Agree">
+          <div class="ui positive button", id="${agree}">
             Yes
           </div>
         </div>
       </div>
     </div>`;
-    $('.ui.modal').modal('show');
-    Agree.addEventListener("click", f);
+    $('#' + id).modal('show');
+    document.getElementById(agree).addEventListener("click", f);
 }
 function promptContent(title, content) {
+    let id = 'content' + ++count;
     document.body.innerHTML += `
-    <div class="ui modal">
+    <div class="ui modal" id="${id}">
       <div class="header">
         ${title}
       </div>
@@ -59,7 +62,14 @@ function promptContent(title, content) {
         </div>
       </div>
     </div>`;
-    $('.ui.modal').modal('show');
+    return '#' + id;
+}
+let Exp, Inform;
+if (domain == "/") {
+    Exp = promptContent("Success", "更新成功");
+    Inform = promptContent("NFLSOJ Helper 帮助信息", `
+    <p>版本：v${GM_info.script.version}</p>
+    <p>作者：${GM_info.script.author}</p>`);
 }
 /******************** contest module ********************/
 try {
@@ -127,13 +137,6 @@ if (domain == "/") {
     }
     mian.appendChild(script);
 }
-/******************** problemshow module ********************/
-// if (/^\/problem\//.test(domain)) {
-//     let data = JSON.parse((await getDOM("/article/154/edit")).getElementById("content").textContent);
-//     if (data.hasOwnProperty(domain.match(/\d+/)[0])) {
-//         window.location.href = data[domain.match(/\d+/)[0]];
-//     };
-// }
 /******************** subscribe module ********************/
 function versionCompare(sources, dests) {
     sources = sources.split('.');
@@ -149,7 +152,7 @@ function versionCompare(sources, dests) {
     return false;
 }
 if (localStorage.getItem("show_changelog") != null) {
-    promptContent("更新日志", localStorage.getItem("show_changelog"));
+    $(promptContent("更新日志", localStorage.getItem("show_changelog"))).modal('show');
     localStorage.removeItem("show_changelog");
 }
 async function updateScript(latest) {
@@ -437,6 +440,8 @@ if (domain == "/") {
             <i class="ui linkify icon"></i>转到 NFLSOJ Helper 官方主页
           </a><a class="ui green button" id="l2" style="position:relative;left:20px;">
             <i class="repeat icon"></i>获取最新版
+          </a><a class="ui orange button" id="l3" style="position:relative;left:20px;">
+            <i class="info icon"></i>帮助
           </a>
         </td></tr>
         <tr><td>
@@ -456,9 +461,11 @@ if (domain == "/") {
     l2.addEventListener("click", async () => {
         updateScript(await $.get(`https://api.github.com/repos/${repo}/releases/latest`));
     });
+    l3.addEventListener("click", () => {$(Inform).modal('show');});
+    let updExpire = () => {document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;}
     f1.addEventListener("click", () => {
-        document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
-        alert("Success");
+        updExpire();
+        $(Exp).modal('show');
     });
     f2.addEventListener("click", () => {
         let ans = prompt("请输入背景链接，想删除背景选择“取消”，默认图片由GlaceonVGC提供", `https://raw.githubusercontent.com/${repo}/master/images/471.jpg`);
