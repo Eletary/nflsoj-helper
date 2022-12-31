@@ -152,6 +152,10 @@ if (localStorage.getItem("show_changelog") != null) {
     promptContent("更新日志", localStorage.getItem("show_changelog"));
     localStorage.removeItem("show_changelog");
 }
+async function updateScript(latest) {
+    localStorage.setItem("show_changelog", await $.post("/api/v2/markdown","s=" + encodeURIComponent(`## ${latest.tag_name}\n${latest.body}`)));
+    window.location.href = `https://github.com/${repo}/releases/download/${latest.tag_name}/nflsoj-helper.min.user.js`;
+}
 if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
     let today = new Date(Date.now()).toDateString();
     if (localStorage.getItem("last_updated") != today) {
@@ -159,10 +163,7 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
         setTimeout(async () => {
             let latest = await $.get(`https://api.github.com/repos/${repo}/releases/latest`);
             if (versionCompare(latest.tag_name.slice(1), GM_info.script.version)) {
-                promptYesOrNo("更新提醒", `检测到新版本 ${latest.tag_name}，是否更新？`, async () => {
-                    localStorage.setItem("show_changelog", await $.post("/api/v2/markdown","s=" + encodeURIComponent(`## ${latest.tag_name}\n${latest.body}`)));
-                    window.location.href = `https://github.com/${repo}/releases/download/${latest.tag_name}/nflsoj-helper.min.user.js`;
-                });
+                promptYesOrNo("更新提醒", `检测到新版本 ${latest.tag_name}，是否更新？`, () => {updateScript(latest)});
             }
         }, 0);
     }
@@ -450,7 +451,7 @@ if (domain == "/") {
         if (l1.checked) localStorage.removeItem("last_updated");
     });
     l2.addEventListener("click", async () => {
-        window.location.href = `https://github.com/${repo}/releases/download/${(await $.get(`https://api.github.com/repos/${repo}/releases/latest`)).tag_name}/nflsoj-helper.min.user.js`;
+        updateScript(await $.get(`https://api.github.com/repos/${repo}/releases/latest`));
     });
     f1.addEventListener("click", () => {
         document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;
