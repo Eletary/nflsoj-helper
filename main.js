@@ -14,15 +14,79 @@
 // @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
 // ==/UserScript==
-/* eslint-disable no-undef */
+/* global $, md5 */
 /* eslint-disable curly */
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper";
+/******************** login module ********************/
+function loginCookie(cookie) {
+    console.log(cookie);
+    document.cookie = 'login=' + cookie + ';expires=Wed, 04 Aug 2077 01:00:00 GMT';
+    document.cookie = 'connect.sid=;';
+}
+if (domain == "/login") {
+    $(document).ready(() => {
+        let script = document.createElement('script');
+        script.innerHTML = "login = () => {}";
+        document.body.appendChild(script);
+        let hack = () => {
+            console.log('ewe');
+            let show_error = (error) => {$("#error").text(error);$("#error").show();}
+            let username = $("#username").val(), password = md5($("#password").val() + "syzoj2_xxx");
+            $("#login").addClass("loading");
+            $.ajax({
+                url: "/api/login",
+                type: 'POST',
+                data: {
+                    "username": $("#username").val(),
+                    "password": password
+                },
+                async: true,
+                success: function(data) {
+                    let error_code = data.error_code;
+                    switch (error_code) {
+                        case 1001:
+                            show_error("用户不存在");
+                            break;
+                        case 1002:
+                            show_error("密码错误");
+                            break;
+                        case 1003:
+                            show_error("您尚未设置密码，请通过下方「忘记密码」来设置您的密码。");
+                            break;
+                        case 2022:
+                            show_error("用户已过期");
+                            break;
+                        case 2020:
+                        case 1:
+                            loginCookie(escape(`["${username}","${password}"]`));
+                            window.location.href = "/";
+                            return;
+                        default:
+                            show_error("未知错误");
+                            break;
+                    }
+                    $("#login").text("登录");
+                    $("#login").removeClass("loading");
+                },
+                error:  function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert(XMLHttpRequest.responseText);
+                    show_error("未知错误");
+                    $("#login").text("登录");
+                }
+            });
+        };
+        let key_hack = (event) => {if (event.keyCode == 13) hack();};
+        $("#username").keydown(key_hack);
+        $("#password").keydown(key_hack);
+        $("#login").click(hack);
+    });
+}
 /******************** prompt module ********************/
 let count = 0;
 function promptYesOrNo(title, content, f) {
     let id = 'yesorno' + ++count, agree = 'Argee' + count;
-    document.body.innerHTML += `
+    $('body').append(`
     <div class="ui modal" id="${id}">
       <div class="header">
         ${title}
@@ -40,13 +104,13 @@ function promptYesOrNo(title, content, f) {
           </div>
         </div>
       </div>
-    </div>`;
+    </div>`);
     $('#' + id).modal('show');
-    document.getElementById(agree).addEventListener("click", f);
+    $('#' + agree).click(f);
 }
 function promptContent(title, content) {
     let id = 'content' + ++count;
-    document.body.innerHTML += `
+    $("body").append(`
     <div class="ui modal" id="${id}">
       <div class="header">
         ${title}
@@ -61,20 +125,18 @@ function promptContent(title, content) {
           </div>
         </div>
       </div>
-    </div>`;
+    </div>`);
     return '#' + id;
 }
 let Exp, Inform;
 if (domain == "/") {
-    Exp = promptContent("Success", "更新成功");
     Inform = promptContent("NFLSOJ Helper 帮助信息", `
-    <p>版本：v${GM_info.script.version}</p>
-    <p>作者：${GM_info.script.author}</p>`);
+    <p>版本：v${GM_info.script.version}</p><p>作者：${GM_info.script.author}</p>`); // eslint-disable-line no-undef
 }
 /******************** contest module ********************/
 try {
     let username = $(".dropdown.item")[1].children[0].innerText.slice(0, -1);
-    if (document.body.innerHTML.includes("我的比赛")) $(".menu")[1].innerHTML += `<a class="item" href="/summary/?username=${username}"><i class="tasks icon"></i>总结</a>`;
+    if ($("body").html().includes("我的比赛")) $(".menu")[1].innerHTML += `<a class="item" href="/summary/?username=${username}"><i class="tasks icon"></i>总结</a>`;
     if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
 } catch {
     console.info('iframe');
@@ -131,7 +193,7 @@ if (domain == "/") {
             opacity: .4;
           }
         </style>` + mian.innerHTML;
-        hit.addEventListener("click", async () => {mian.children[1].innerHTML = await hitokoto();});
+        $("#hit").click(async () => {mian.children[1].innerHTML = await hitokoto();});
     } catch {
         console.error("rightcol.hitokoto: require network connection");
     }
@@ -165,7 +227,7 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
         localStorage.setItem("last_updated", today);
         setTimeout(async () => {
             let latest = await $.get(`https://api.github.com/repos/${repo}/releases/latest`);
-            if (versionCompare(latest.tag_name.slice(1), GM_info.script.version)) {
+            if (versionCompare(latest.tag_name.slice(1), GM_info.script.version)) { // eslint-disable-line no-undef
                 promptYesOrNo("更新提醒", `检测到新版本 ${latest.tag_name}，是否更新？`, () => {updateScript(latest)});
             }
         }, 0);
@@ -259,7 +321,7 @@ if (/problem/.test(domain)) {
         for (let q of value.children)
             if (q.innerHTML.includes('数据范围') || q.innerHTML.includes('C++'))
                 p += q.outerHTML;
-        value.innerHTML = p;
+        $(value).html(p);
         try {
             let script = document.createElement("script");
             script.innerText = document.getElementsByTagName("script")[16].innerText;
@@ -272,7 +334,7 @@ if (/problem/.test(domain)) {
 /******************** copy module ********************/
 function addCopy(button, code) {
     button.addEventListener("click", () => {
-        GM_setClipboard(code.textContent.replaceAll("\n", "\r\n"), "Copy");
+        GM_setClipboard(code.textContent.replaceAll("\n", "\r\n"), "Copy"); // eslint-disable-line no-undef
         button.textContent = "Copied!";
         setTimeout(() => {button.textContent = "Copy";}, 1000);
     })
@@ -281,12 +343,12 @@ let clickCountForCode = 0;
 function formatCode() {
     clickCountForCode ^= 1;
     let value = $(".existing.segment")[0];
-    value.children[1].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode;
+    value.children[1].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode; // eslint-disable-line no-undef
     value.children[0].children[1].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
 }
 function articleAddCopy(button, code) {
     button.addEventListener("click", () => {
-        GM_setClipboard(code.textContent, "text");
+        GM_setClipboard(code.textContent, "text"); // eslint-disable-line no-undef
         button.lastChild.textContent = "复制成功!";
         setTimeout(() => {button.lastChild.textContent = "复制";}, 1000);
     })
@@ -383,6 +445,7 @@ async function Rating() {
     const hisRating = $(".center.aligned.header")[0].innerText.replaceAll("(", "\\(").replaceAll(")", "\\)") + `<\\/td>[\\s\\S]*?(<td>\\d{3,4}[^/]*?<\\/td>)`,
           curRating = /<i class="star icon"><\/i>积分 (\d+)/;
     let arr = document.getElementsByTagName("tbody")[0].rows, c = Array.from({length: arr.length}, (v, i) => i);
+    console.log(arr[0].innerHTML.match(/\/user\/\d+/)[0], hisRating);
     c = (await $.get(arr[0].innerHTML.match(/\/user\/\d+/)[0])).match(hisRating) != null
         ? await Promise.all(c.map(async i => (await $.get(arr[i].innerHTML.match(/\/user\/\d+/)[0])).match(hisRating)[1]))
         : calcRating(await Promise.all(c.map(async i => ({
@@ -411,10 +474,10 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
         $(".padding")[0].innerHTML =
               `<span class="ui mini right floated labeled blue icon button" id="rating" style="top:6px;"><i class="calculator icon" id=calc></i>Predict Rating</span>`
             + $(".padding")[0].innerHTML;
-        rating.addEventListener("click", async () => {
-            rating.childNodes[1].data = "Please Wait...";
+        $('#rating').click(async () => {
+            $('#rating').html("<i class='calculator icon' id=calc></i>Please Wait...");
             await Rating();
-            rating.childNodes[1].data = "Done!";
+            $('#rating').html("<i class='calculator icon' id=calc></i>Done!");
         });
     }
 }
@@ -435,7 +498,7 @@ if (domain == "/") {
           </span>
         </td></tr>
         <tr><td>
-          <h4 style="display:inline;">官网链接</h4>
+          <h4 style="display:inline;">相关链接</h4>
           <a class="ui blue button" style="position:relative;left:20px;" href="https://github.com/${repo}/">
             <i class="ui linkify icon"></i>转到 NFLSOJ Helper 官方主页
           </a><a class="ui green button" id="l2" style="position:relative;left:20px;">
@@ -447,30 +510,29 @@ if (domain == "/") {
         <tr><td>
           <h4 style="display:inline;">主要功能</h4>
           <a class="ui button" id="f1" style="position:relative;left:20px;">
-            <i class="code icon"></i>延长登录时间
-          </a><a class="ui button" id="f2" style="position:relative;left:20px;">
             <i class="code icon"></i>更换背景
+          </a><a class="ui button" id="f2" style="position:relative;left:20px;">
+            <i class="code icon"></i>Login with cookie
           </a>
         </td></tr>
       </table>
     </div>` + col.innerHTML.slice(ind);
-    l1.addEventListener("click", () => {
-        localStorage.setItem("disable_auto_update", l1.checked ? "N" : "Y");
-        if (l1.checked) localStorage.removeItem("last_updated");
+    $('#l1').click(() => {
+        localStorage.setItem("disable_auto_update", $('#l1').prop('checked') ? "N" : "Y");
+        if ($('#l1').prop('checked')) localStorage.removeItem("last_updated");
     });
-    l2.addEventListener("click", async () => {
+    $('#l2').click(async () => {
         updateScript(await $.get(`https://api.github.com/repos/${repo}/releases/latest`));
     });
-    l3.addEventListener("click", () => {$(Inform).modal('show');});
-    let updExpire = () => {document.cookie = `${document.cookie.match(/(^| )(login=[^;]*)(;|$)/)[2]};expires=Wed, 04 Aug 2077 01:00:00 GMT`;}
-    f1.addEventListener("click", () => {
-        updExpire();
-        $(Exp).modal('show');
-    });
-    f2.addEventListener("click", () => {
+    $('#l3').click("click", () => {$(Inform).modal('show');});
+    $('#f1').click(() => {
         let ans = prompt("请输入背景链接，想删除背景选择“取消”，默认图片由GlaceonVGC提供", `https://raw.githubusercontent.com/${repo}/master/images/471.jpg`);
         localStorage.setItem("bgurl", ans);
         localStorage.setItem("fgopacity", ans ? 0.8 : 1.0);
+        window.location.reload();
+    });
+    $('#f2').click(async () => {
+        loginCookie(prompt("Cookie:", ""));
         window.location.reload();
     });
 }
