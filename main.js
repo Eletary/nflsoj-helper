@@ -69,7 +69,7 @@ if (domain == "/login") {
                     $("#login").text("登录");
                     $("#login").removeClass("loading");
                 },
-                error:  function(XMLHttpRequest, textStatus, errorThrown) {
+                error:  function(XMLHttpRequest) {
                     alert(XMLHttpRequest.responseText);
                     show_error("未知错误");
                     $("#login").text("登录");
@@ -128,7 +128,7 @@ function promptContent(title, content) {
     </div>`);
     return '#' + id;
 }
-let Exp, Inform;
+let Inform;
 if (domain == "/") {
     Inform = promptContent("NFLSOJ Helper 帮助信息", `
     <p>版本：v${GM_info.script.version}</p><p>作者：${GM_info.script.author}</p>`); // eslint-disable-line no-undef
