@@ -4,10 +4,10 @@ on:
   # Trigger the workflow on push or pull request,
   push:
     paths:
-      - main.js
+      - index.js
   pull_request:
     paths:
-      - main.js
+      - index.js
 
 jobs:
   run-linters:

@@ -6,13 +6,14 @@
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match        *://www.nfls.com.cn:20035/*
 // @match        *://192.168.188.77/*
+// @match        *://192.168.188.88/*
 // @require      http://www.nfls.com.cn:20035/cdnjs/jquery/3.3.1/jquery.min.js
 // @require      http://www.nfls.com.cn:20035/cdnjs/blueimp-md5/2.10.0/js/md5.min.js
 // @require      http://www.nfls.com.cn:20035/cdnjs/semantic-ui/2.4.1/semantic.min.js
 // @grant        GM_setClipboard
 // @grant        GM_info
-// @icon         https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
-// @icon64       https://raw.githubusercontent.com/NFLSCode/nflsoj-helper/master/images/icon.png
+// @icon         https://cdn.jsdelivr.net/gh/NFLSCode/nflsoj-helper@master/images/icon.png
+// @icon64       https://cdn.jsdelivr.net/gh/NFLSCode/nflsoj-helper@master/images/icon.png
 // ==/UserScript==
 /* global $, md5 */
 /* eslint-disable curly */
@@ -133,6 +134,40 @@ if (domain == "/") {
     Inform = promptContent("NFLSOJ Helper 帮助信息", `
     <p>版本：v${GM_info.script.version}</p><p>作者：${GM_info.script.author}</p>`); // eslint-disable-line no-undef
 }
+/******************** subscribe module ********************/
+function versionCompare(sources, dests) {
+    sources = sources.split('.');
+    dests = dests.split('.');
+    let maxL = Math.max(sources.length, dests.length);
+    for (let i = 0; i < maxL; ++i) {
+        let preValue = sources.length > i ? sources[i]: 0,
+            preNum = isNaN(Number(preValue)) ? preValue.charCodeAt() : Number(preValue),
+            lastValue = dests.length > i ? dests[i] : 0,
+            lastNum = isNaN(Number(lastValue)) ? lastValue.charCodeAt() : Number(lastValue);
+        if (preNum != lastNum) return preNum > lastNum;
+    }
+    return false;
+}
+if (localStorage.getItem("show_changelog") != null) {
+    $(promptContent("更新日志", localStorage.getItem("show_changelog"))).modal('show');
+    localStorage.removeItem("show_changelog");
+}
+async function updateScript(latest) {
+    localStorage.setItem("show_changelog", await $.post("/api/v2/markdown","s=" + encodeURIComponent(`## ${latest.tag_name}\n${latest.body}`)));
+    window.location.href = `https://github.com/${repo}/releases/download/${latest.tag_name}/nflsoj-helper.min.user.js`;
+}
+if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
+    let today = new Date(Date.now()).toDateString();
+    if (localStorage.getItem("last_updated") != today) {
+        localStorage.setItem("last_updated", today);
+        setTimeout(async () => {
+            let latest = await $.get(`https://api.github.com/repos/${repo}/releases/latest`);
+            if (versionCompare(latest.tag_name.slice(1), GM_info.script.version)) { // eslint-disable-line no-undef
+                promptYesOrNo("更新提醒", `检测到新版本 ${latest.tag_name}，是否更新？`, () => {updateScript(latest)});
+            }
+        }, 0);
+    }
+}
 /******************** contest module ********************/
 try {
     let username = $(".dropdown.item")[1].children[0].innerText.slice(0, -1);
@@ -167,10 +202,7 @@ function genSearchBox(use, id, holder, api) {
 }
 async function hitokoto() {
     let h = await $.get("https://v1.hitokoto.cn/?c=a");
-    return `
-    <div>${h.hitokoto}
-      <div style="margin-top: 14px;text-align: right;font-size: .95em;color: #999;">${"\u2014\u2014"}${h.from}</div>
-    </div>`;
+    return `${h.hitokoto}<div style="margin-top: 14px;text-align: right;font-size: .95em;color: #999;">${"\u2014\u2014"}${h.from}</div>`;
 }
 if (domain == "/") {
     document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
@@ -184,7 +216,17 @@ if (domain == "/") {
         mian.innerHTML = `
         <h4 class="ui block top attached header"><i aria-hidden="true" class="comment alternate icon"></i><div class="content">Hitokoto (ヒトコト)
           <i id="hit" title="Refresh" style="" class="redo icon button"></i></div></h4>
-        <div class="ui bottom attached center aligned segment">${await hitokoto()}</div>
+        <div class="ui bottom attached center aligned segment">
+          <div id="hitword"></div>
+          <div id="hithold" class="ui placeholder">
+            <div class="paragraph">
+              <div class="line"></div>
+              <div class="line"></div>
+              <div class="line"></div>
+              <div class="line"></div>
+            </div>
+          </div>
+        </div>
         <style>
           #hit {
             opacity: .2;position: absolute;right: 10px;height: 19px;display: inline-flex;align-items: center;
@@ -193,45 +235,19 @@ if (domain == "/") {
             opacity: .4;
           }
         </style>` + mian.innerHTML;
-        $("#hit").click(async () => {mian.children[1].innerHTML = await hitokoto();});
+        let getyy = async () => {
+            $("#hitword").hide();
+            $("#hithold").show();
+            $("#hitword").html(await hitokoto());
+            $("#hitword").show();
+            $("#hithold").hide()
+        };
+        getyy();
+        $("#hit").click(getyy);
     } catch {
         console.error("rightcol.hitokoto: require network connection");
     }
     mian.appendChild(script);
-}
-/******************** subscribe module ********************/
-function versionCompare(sources, dests) {
-    sources = sources.split('.');
-    dests = dests.split('.');
-    let maxL = Math.max(sources.length, dests.length);
-    for (let i = 0; i < maxL; ++i) {
-        let preValue = sources.length > i ? sources[i]: 0,
-            preNum = isNaN(Number(preValue)) ? preValue.charCodeAt() : Number(preValue),
-            lastValue = dests.length > i ? dests[i] : 0,
-            lastNum = isNaN(Number(lastValue)) ? lastValue.charCodeAt() : Number(lastValue);
-        if (preNum != lastNum) return preNum > lastNum;
-    }
-    return false;
-}
-if (localStorage.getItem("show_changelog") != null) {
-    $(promptContent("更新日志", localStorage.getItem("show_changelog"))).modal('show');
-    localStorage.removeItem("show_changelog");
-}
-async function updateScript(latest) {
-    localStorage.setItem("show_changelog", await $.post("/api/v2/markdown","s=" + encodeURIComponent(`## ${latest.tag_name}\n${latest.body}`)));
-    window.location.href = `https://github.com/${repo}/releases/download/${latest.tag_name}/nflsoj-helper.min.user.js`;
-}
-if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
-    let today = new Date(Date.now()).toDateString();
-    if (localStorage.getItem("last_updated") != today) {
-        localStorage.setItem("last_updated", today);
-        setTimeout(async () => {
-            let latest = await $.get(`https://api.github.com/repos/${repo}/releases/latest`);
-            if (versionCompare(latest.tag_name.slice(1), GM_info.script.version)) { // eslint-disable-line no-undef
-                promptYesOrNo("更新提醒", `检测到新版本 ${latest.tag_name}，是否更新？`, () => {updateScript(latest)});
-            }
-        }, 0);
-    }
 }
 /******************** style module ********************/
 (/contests|practices|statistics|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0] :
@@ -481,12 +497,24 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
         });
     }
 }
+/******************** settings module ********************/
+if (/user\/\d+\/edit/.test(domain)) {
+    let intro;
+    for (let q of $(await $.get(domain.slice(0, 9))).find('.row'))
+        if ($(q).html().includes('个性签名'))
+            intro = q.children[0].children[1];
+    if (intro.children[0] != null) intro = intro.children[0];
+    $('.field')[5].after($(`<div class="field">
+      <label for="information">个性签名（技术原因无法获取签名源码）</label>
+      <textarea class="markdown-edit" rows="5" id="information" name="information">${intro.innerHTML}</textarea>
+    </div>`)[0]);
+}
 /******************** dashboard ********************/
 if (domain == "/") {
     let col = $(".eleven.wide.column")[0], ind = col.innerHTML.search(/<h4 class="ui top attached block header"><i class="ui signal/);
     col.innerHTML = col.innerHTML.slice(0, ind) + `
     <h4 class="ui top attached block header">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAATfSURBVHhe7ZvtbuI4FIYdvikFMdXMbn9MpUpzG72F3YvduYT2NuZHq/7YUTsdSvkMgaxfx6ecmBAWx4mA9JGsGCexfd5z/EWLF0qEwd3dnc6dFjc3Nzq3ZkOAUzWew4V4F2Cb4UmqHRO77NoqwLEbbpIkBGysIHPqxgPYlGRXpQzGbwO2qwggymC8aWNMgLLARXgXoEyhzyllBHA+BNDX0vIhgL6Wlg8B9HUvPM8Tq9VKf4o+c+r1uiqr1Wri/PxcVCrrZvizQRDoXESn0xGtVmujPoCyZrOpruZ7gN/fB+sI4Eah0xx0EGcsXEejUUysdrutc0IJRKDjw+FQTCYT9W61WtV3IkFRNp/P1RWimtB9sy+7sBLg4uIipvRsNtO5iKQOEtPpVOfiNBoNZTTVu1wu1RWYHufimJh92YWVAC8vLxte4vDOm8CbScB7MJ5HCEGCknGIEldYDwFAoY2xx8HwgDHwqjmm08SBqIA/D8hgCu9tItqQSQB0GJ2F9zg0jn3fV14jwwBEIZImM3r++vpal6yFJhaLhc5lx0oA7gFuHJFURvAI4JOgGUX39/c6t5u0OWEXVgJwA03vg16vp3ObwHs0LCgBmgOQIAyfLNEe3YNQpsAQle6niZ+ElQA8BJM69Pr6qnOb4FkKc0oEfcbQMJczupckOKD7+5JpDjgFCheg2+2qUE1bDYrESgCadGAEkjmBpfH8/KzmiCwTl0usBMAkhXkAnsSaj+Xu/wKxsOU9FKwEgMFYCmnDY+7e+v2+Kke4j8djXRqBiEG5CZ4HEOjy8lLlOdQOPcdBNMEhZ2dniffTsJ4D0BAlvmTh82AwUDMyruaSiM6+vb3pT2tITAj2+Pio8gTeQX1oB1dzyGGjhA0WbcD4u7uwEgANoCFKOMYS6Bw8DG9hqPBTI5F0YoMRqAvRhfe4kWgPCeWo1xxy8DzeJXh+F9YRwBlP1mEe1j3l4dF0LIJwKWZ+/PQXLldinnRikz0ZzaaiLY2ZTGbCn6/3GqtKJDj2B4iCwDBw3xMgx0qADYXXO1rhL6LOVGXVSLVa/ODiLYPkRmUdlVZbwOya1xDdVj8ql3jt9fkBNHrGJsk4K+yDlQBXV1c6p2Htj2dyDDZkyHZqwqt5YsXW+6+fvryHdqOB7XBVIJin0myvVRcd+XzTq4s/un3xOv2lngOYS7yerK8p6/3UEE+/nvWdiC+f/9S5/bES4OHhQeciwmAdEWcyhb6cG8aBKpcLZXRD8vj7ScwRyjL5PrbDSwHftoVcUYYL9XwYLsQgiC+TXSlKOJT1zeX93764qMe/cPn59K/O7Y+VAHnQ7bJxVCDOBMDIz/I9zcDf/G6gCJwJgGkJ4W/Lw2z7CTJPvNvbWzWAs/51+Ns/f+lcdn78/V3n8oP+McRJBLg0HriuL43MAuTV2aJEyDwEeEddhK7r+rbhdAgcMwcvADxlJpccZQS4FOFoh4ArEQ5eAEzOPLmm9JOg02XQNUnLIA/9LBFB9WSOgLzW6iK2w8DJEHDd2aKMB84OQ0VxcENgF2iIp0Mj9wjI0+ijiIC8hHVVbyH7ANciuKzvfQiAvLx1iBQ2BA4RPi/FBDjEWTpvKmUKe2A6eWMI4IFTjQTTLjg/9aezpxIdabbFfjx9qp434Y7d+PU4OGUh4lEtxH8AfYGTaReJbgAAAABJRU5ErkJggg==" style="width:20px;height:20px;position:relative;top:-3px;">NFLSOJ Helper 控制面板
+      <img src="https://cdn.jsdelivr.net/gh/${repo}@master/images/icon.png" style="width:20px;height:20px;position:relative;top:-3px;">NFLSOJ Helper 控制面板
     </h4>
     <div class="ui bottom attached segment">
       <table class="ui very basic table" style="table-layout: fixed;">
@@ -526,7 +554,7 @@ if (domain == "/") {
     });
     $('#l3').click("click", () => {$(Inform).modal('show');});
     $('#f1').click(() => {
-        let ans = prompt("请输入背景链接，想删除背景选择“取消”，默认图片由GlaceonVGC提供", `https://raw.githubusercontent.com/${repo}/master/images/471.jpg`);
+        let ans = prompt("请输入背景链接，想删除背景选择“取消”，默认图片由GlaceonVGC提供", `https://cdn.jsdelivr.net/gh/${repo}@master/images/471.jpg`);
         localStorage.setItem("bgurl", ans);
         localStorage.setItem("fgopacity", ans ? 0.8 : 1.0);
         window.location.reload();
