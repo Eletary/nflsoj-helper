@@ -17,7 +17,7 @@ jobs:
           echo ${{ github.ref }} > temp
           python ./release.py
       - name: Prepare file
-        run: mv main.js nflsoj-helper.min.user.js
+        run: mv index.js nflsoj-helper.min.user.js
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
