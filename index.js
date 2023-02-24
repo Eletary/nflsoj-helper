@@ -500,7 +500,7 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
 /******************** settings module ********************/
 if (/user\/\d+\/edit/.test(domain)) {
     let intro;
-    for (let q of $(await $.get(domain.slice(0, 9))).find('.row'))
+    for (let q of $(await $.get($('.dropdown.item')[1].children[0].href)).find('.row'))
         if ($(q).html().includes('个性签名'))
             intro = q.children[0].children[1];
     if (intro.children[0] != null) intro = intro.children[0];
