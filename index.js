@@ -267,18 +267,6 @@ if (/dp/.test(domain)){
 function genColorHTML(t, data, name, color) {
     return `<${t} ${data}><span style="color:${color[0]}">${name[0]}</span><span style="color:${color[1]};">${name.slice(1)}</span></${t}>`;
 }
-async function getUserConfig(domain) {
-    let doc = await getDOM(domain), backup = doc.getElementsByClassName("icon")[13].classList.value, config = {
-        nameColor: ["black", "black"],
-        userIcon: /(man|woman) icon/.test(backup) ? backup : ""
-    }
-    let discuss = doc.body.innerHTML.match(/<td><a href="(\/article\/\d+)">\$helper.config<\/a><\/td>/);
-    if (discuss) {
-        discuss = JSON.parse((await getDOM(discuss[1] + "/edit")).getElementById("content").textContent);
-        for (let key in discuss) config[key] = discuss[key];
-    }
-    return config;
-}
 async function getEmail(user, size) {
     let mainpage = (await getDOM(user)).getElementsByClassName("attached segment");
     for (let i = 0; i < mainpage.length; ++i)
@@ -287,11 +275,7 @@ async function getEmail(user, size) {
     return "/self/gravatar.png";
 }
 if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
-    let config = await getUserConfig(domain);
     let mainpage = $(".attached.segment");
-    let nameColor = genColorHTML("nobr", "", mainpage[0].innerHTML, config.nameColor), customIcon = `<i class="${config.userIcon}"></i>`;
-    mainpage[0].innerHTML = nameColor;
-    $(".header")[1].innerHTML = nameColor + " " + customIcon;
     try {
         for (let i = 0; i < mainpage.length; ++i)
             if (mainpage[i].parentNode.innerText.includes("Email"))
@@ -312,13 +296,6 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
         for (let i = 0; i < rank.length; ++i) window.eval(rank[i].childNodes[9].children[0].innerHTML); // eslint-disable-line no-eval
         $(".aligned.table")[0].tHead.children[0].children[1].style.width = "140px";
         $(".aligned.table")[0].tHead.children[0].innerHTML += "<th>个性签名</th>";
-        let res = await Promise.all(Array.from({length: rank.length}, (v, i) => rank[i]).map(async td => {
-                const href = td.children[1].children[0].getAttribute("href"), name = td.children[1].innerText;
-                td.children[1].innerHTML = genColorHTML("a", `href=${href}`, name, ["black", "black"]);
-                let config = await getUserConfig(href);
-                return genColorHTML("a", `href=${href}`, name, config.nameColor);
-            }));
-        for (let i = 0; i < rank.length; ++i) rank[i].children[1].innerHTML = res[i];
     }, 0);
 }
 /******************** BZOJ module ********************/
@@ -483,6 +460,19 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
         head.innerHTML = head.innerHTML.slice(0, pos) + "<th>用户名</th>" + head.innerHTML.slice(pos);
         for (let i = 0; i < arr.length; ++i) {
             let pos = /ranklist/.test(domain) ? arr[i].innerHTML.indexOf("</td>") : 0;
+            arr[i].innerHTML = arr[i].innerHTML.slice(0, pos) + name[i] + arr[i].innerHTML.slice(pos);
+        }
+    }
+    if (head.innerHTML.indexOf("nick") == -1) {
+        let arr = document.getElementsByTagName("tbody")[0].rows;
+        let name = await Promise.all(Array.from({length: arr.length}, (v, i) => i).map(async (i) => {
+            let raw = await getDOM(arr[i].innerHTML.match(/\/user\/\d+/)[0] + '/edit');
+            return `<td>${raw.getElementById('nickname').value}</td>`;
+        }));
+        pos = head.innerHTML.search("用户名[\s\S]*?<\/th>") + 10;
+        head.innerHTML = head.innerHTML.slice(0, pos) + "<th>nick</th>" + head.innerHTML.slice(pos);
+        for (let i = 0; i < arr.length; ++i) {
+            let pos = /ranklist/.test(domain) ? arr[i].innerHTML.search("</a></td>") : 0;
             arr[i].innerHTML = arr[i].innerHTML.slice(0, pos) + name[i] + arr[i].innerHTML.slice(pos);
         }
     }
