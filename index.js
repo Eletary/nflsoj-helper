@@ -18,7 +18,7 @@
 /* global $, md5 */
 /* eslint-disable curly */
 
-const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper";
+const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", USERNAME = /\/user\/\d+/;
 /******************** login module ********************/
 function loginCookie(cookie) {
     console.log(cookie);
@@ -87,7 +87,7 @@ if (domain == "/login") {
 let count = 0;
 function promptYesOrNo(title, content, f) {
     let id = 'yesorno' + ++count, agree = 'Argee' + count;
-    $('body').append(`
+    $('body').prepend(`
     <div class="ui modal" id="${id}">
       <div class="header">
         ${title}
@@ -111,7 +111,7 @@ function promptYesOrNo(title, content, f) {
 }
 function promptContent(title, content) {
     let id = 'content' + ++count;
-    $("body").append(`
+    $("body").prepend(`
     <div class="ui modal" id="${id}">
       <div class="header">
         ${title}
@@ -264,9 +264,6 @@ Array.from($(".ui.comments")).forEach((value) => {
 if (/dp/.test(domain)){
     document.getElementsByTagName("table")[0].style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.8)";
 }
-function genColorHTML(t, data, name, color) {
-    return `<${t} ${data}><span style="color:${color[0]}">${name[0]}</span><span style="color:${color[1]};">${name.slice(1)}</span></${t}>`;
-}
 async function getEmail(user, size) {
     let mainpage = (await getDOM(user)).getElementsByClassName("attached segment");
     for (let i = 0; i < mainpage.length; ++i)
@@ -274,7 +271,18 @@ async function getEmail(user, size) {
             return `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=${size}&d=mp`;
     return "/self/gravatar.png";
 }
+async function getNick(url) {
+    console.log(url);
+    return (await getDOM(url +'/edit')).getElementById('nickname').value
+}
 if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
+    if ($(".dropdown.item")[1].children[0].href.match(USERNAME)[0] != domain.match(USERNAME)[0])
+        $('.ui.grid').find('.row')[2].outerHTML += `
+        <div class="row">
+          <div class="column">
+            <h4 class="ui top attached block header">姓名</h4>
+            <div class="ui bottom attached segment">${await getNick(domain.match(USERNAME)[0])}</div>
+        </div></div>`;
     let mainpage = $(".attached.segment");
     try {
         for (let i = 0; i < mainpage.length; ++i)
@@ -338,22 +346,6 @@ function formatCode() {
     let value = $(".existing.segment")[0];
     value.children[1].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode; // eslint-disable-line no-undef
     value.children[0].children[1].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
-}
-function articleAddCopy(button, code) {
-    button.addEventListener("click", () => {
-        GM_setClipboard(code.textContent, "text"); // eslint-disable-line no-undef
-        button.lastChild.textContent = "复制成功!";
-        setTimeout(() => {button.lastChild.textContent = "复制";}, 1000);
-    })
-}
-if (/article\/\d+(?=\/(?!e)|$)/.test(domain)) {
-    let href = domain.match(/\/article\/\d+/)[0];
-    let article = await getDOM(href + "/edit");
-    let ownDiscuss = $(".floated.labeled.icon.button")[1],
-        articleCopy = ownDiscuss ? ownDiscuss.parentNode : $(".padding")[0].children[2];
-    articleCopy.innerHTML += `<a style="margin-top:-4px;${ownDiscuss ? "margin-right:3px;" : ""}" class="ui mini orange right floated labeled icon button">
-                                <i class="ui copy icon"></i>复制</a>`;
-    articleAddCopy(articleCopy.lastChild, article.getElementById("content"));
 }
 if (!(/login/.test(domain))) {
     if (/\/submission\/\d+/.test(domain) && document.body.innerText.includes("格式化代码")) {
@@ -438,12 +430,12 @@ async function Rating() {
     const hisRating = $(".center.aligned.header")[0].innerText.replaceAll("(", "\\(").replaceAll(")", "\\)") + `<\\/td>[\\s\\S]*?(<td>\\d{3,4}[^/]*?<\\/td>)`,
           curRating = /<i class="star icon"><\/i>积分 (\d+)/;
     let arr = document.getElementsByTagName("tbody")[0].rows, c = Array.from({length: arr.length}, (v, i) => i);
-    console.log(arr[0].innerHTML.match(/\/user\/\d+/)[0], hisRating);
-    c = (await $.get(arr[0].innerHTML.match(/\/user\/\d+/)[0])).match(hisRating) != null
-        ? await Promise.all(c.map(async i => (await $.get(arr[i].innerHTML.match(/\/user\/\d+/)[0])).match(hisRating)[1]))
+    console.log(arr[0].innerHTML.match(USERNAME)[0], hisRating);
+    c = (await $.get(arr[0].innerHTML.match(USERNAME)[0])).match(hisRating) != null
+        ? await Promise.all(c.map(async i => (await $.get(arr[i].innerHTML.match(USERNAME)[0])).match(hisRating)[1]))
         : calcRating(await Promise.all(c.map(async i => ({
             rank: arr[i].children[0].innerText,
-            currentRating: parseInt((await $.get(arr[i].innerHTML.match(/\/user\/\d+/)[0])).match(curRating)[1])
+            currentRating: parseInt((await $.get(arr[i].innerHTML.match(USERNAME)[0])).match(curRating)[1])
         }))));
     document.getElementsByTagName("thead")[0].rows[0].innerHTML += "<th>Rating(Δ)</th>";
     for (let i = 0; i < arr.length; ++i) arr[i].innerHTML += c[i];
@@ -466,10 +458,9 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
     if (head.innerHTML.indexOf("nick") == -1) {
         let arr = document.getElementsByTagName("tbody")[0].rows;
         let name = await Promise.all(Array.from({length: arr.length}, (v, i) => i).map(async (i) => {
-            let raw = await getDOM(arr[i].innerHTML.match(/\/user\/\d+/)[0] + '/edit');
-            return `<td>${raw.getElementById('nickname').value}</td>`;
+            return `<td>${await getNick(arr[i].innerHTML.match(USERNAME)[0])}</td>`;
         }));
-        pos = head.innerHTML.search("用户名[\s\S]*?<\/th>") + 10;
+        pos = head.innerHTML.search(/用户名[\s\S]*?<\/th>/) + 10;
         head.innerHTML = head.innerHTML.slice(0, pos) + "<th>nick</th>" + head.innerHTML.slice(pos);
         for (let i = 0; i < arr.length; ++i) {
             let pos = /ranklist/.test(domain) ? arr[i].innerHTML.search("</a></td>") : 0;
