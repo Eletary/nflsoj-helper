@@ -19,7 +19,7 @@
 /* eslint-disable curly */
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", USERNAME = /\/user\/\d+/,
-      fool = (localStorage.getItem("meow_meow_meow") != 'N'), foolimg = '<img src="https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif" style="width:24px;height:29px;" />';
+      fool = (localStorage.getItem("meow_meow_meow") != 'N'), foolimg = '<img src="https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif" style="width:24px;height:29px;" />', bigfool = 'https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif'
 /******************** login module ********************/
 function loginCookie(cookie) {
     console.log(cookie);
@@ -271,6 +271,7 @@ if (/dp/.test(domain)){
     document.getElementsByTagName("table")[0].style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.8)";
 }
 async function getEmail(user, size) {
+    if (fool) return bigfool;
     let mainpage = (await getDOM(user)).getElementsByClassName("attached segment");
     for (let i = 0; i < mainpage.length; ++i)
         if (mainpage[i].parentNode.innerText.includes("Email"))
@@ -280,9 +281,11 @@ async function getEmail(user, size) {
 if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
     let mainpage = $(".attached.segment");
     try {
-        for (let i = 0; i < mainpage.length; ++i)
-            if (mainpage[i].parentNode.innerText.includes("Email"))
-                document.getElementsByTagName("img")[0].src = `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=324.183&d=mp`;
+        if (fool) document.getElementsByTagName("img")[0].src = bigfool;
+        else
+            for (let i = 0; i < mainpage.length; ++i)
+                if (mainpage[i].parentNode.innerText.includes("Email"))
+                    document.getElementsByTagName("img")[0].src = `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=324.183&d=mp`;
     } catch {
         console.error("style.email: require network connection");
     }
@@ -542,7 +545,7 @@ if (domain == "/") {
 }
 if (fool) {
     try {
-        $('a.header')[0].innerHTML = `<img src="https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif" />`;
+        $('a.header')[0].innerHTML = `<img src=${bigfool} />`;
     } catch {
         console.log('/yiw');
     }
