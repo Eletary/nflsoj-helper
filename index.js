@@ -18,7 +18,8 @@
 /* global $, md5 */
 /* eslint-disable curly */
 
-const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", USERNAME = /\/user\/\d+/;
+const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", USERNAME = /\/user\/\d+/,
+      fool = (localStorage.getItem("meow_meow_meow") != 'N'), foolimg = '<img src="https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif" style="width:24px;height:29px;" />';
 /******************** login module ********************/
 function loginCookie(cookie) {
     console.log(cookie);
@@ -132,7 +133,12 @@ function promptContent(title, content) {
 let Inform;
 if (domain == "/") {
     Inform = promptContent("NFLSOJ Helper 帮助信息", `
-    <p>版本：v${GM_info.script.version}</p><p>作者：${GM_info.script.author}</p>`); // eslint-disable-line no-undef
+    <p>版本：v${GM_info.script.version}</p><p>作者：${GM_info.script.author}</p>
+    ${foolimg}
+    <span class="ui toggle checkbox" style="position:relative;left:10px;">
+      <input id="meow" type="checkbox" ${localStorage.getItem("meow_meow_meow") == "N" ? "" : "checked"}>
+      <label>  </label>
+    </span>`);
 }
 /******************** subscribe module ********************/
 function versionCompare(sources, dests) {
@@ -271,18 +277,7 @@ async function getEmail(user, size) {
             return `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=${size}&d=mp`;
     return "/self/gravatar.png";
 }
-async function getNick(url) {
-    console.log(url);
-    return (await getDOM(url +'/edit')).getElementById('nickname').value
-}
 if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
-    if ($(".dropdown.item")[1].children[0].href.match(USERNAME)[0] != domain.match(USERNAME)[0])
-        $('.ui.grid').find('.row')[2].outerHTML += `
-        <div class="row">
-          <div class="column">
-            <h4 class="ui top attached block header">姓名</h4>
-            <div class="ui bottom attached segment">${await getNick(domain.match(USERNAME)[0])}</div>
-        </div></div>`;
     let mainpage = $(".attached.segment");
     try {
         for (let i = 0; i < mainpage.length; ++i)
@@ -336,8 +331,11 @@ if (/problem/.test(domain)) {
 function addCopy(button, code) {
     button.addEventListener("click", () => {
         GM_setClipboard(code.textContent.replaceAll("\n", "\r\n"), "Copy"); // eslint-disable-line no-undef
-        button.textContent = "Copied!";
-        setTimeout(() => {button.textContent = "Copy";}, 1000);
+        if (fool) $(button).transition('tada');
+        else {
+            button.textContent = "Copied!";
+            setTimeout(() => {button.textContent = "Copy";}, 1000);
+        }
     })
 }
 let clickCountForCode = 0;
@@ -348,6 +346,10 @@ function formatCode() {
     value.children[0].children[1].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
 }
 if (!(/login/.test(domain))) {
+    let qaq = 'Copy';
+    if (fool) {
+        qaq = foolimg;
+    }
     if (/\/submission\/\d+/.test(domain) && document.body.innerText.includes("格式化代码")) {
         let value = $(".existing.segment")[0];
         value.firstChild.style.borderRadius = "0 .28571429rem 0 0";
@@ -355,18 +357,18 @@ if (!(/login/.test(domain))) {
         let position = value.innerHTML.search(/<\/a>/) + 4;
         value.innerHTML = `<span style="position:absolute;top:0px;right:-4px;">
                              <div class="ui button" style="position:relative;left:4px;border-right:1px solid rgba(0,0,0,0.6);border-radius:0 0 0 .28571429rem;">
-                               Copy
+                               ${qaq}
                              </div>${value.innerHTML.slice(0, position)}
                            </span>${value.innerHTML.slice(position)}`;
         addCopy(value.firstChild.children[0], value.lastChild);
         value.children[0].children[1].addEventListener("click", formatCode);
-        } else {
-            for (let i = 0, e; i < (e = $(".existing.segment")).length; i++) {
-                if (e[i].children[0].localName != "pre") continue;
-                if (/\/problem\//.test(domain) && e[i].parentNode.style.overflow != "hidden") e[i].parentNode.style.width = "50%";
-                e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
-                                 Copy</div>`;
-                addCopy(e[i].lastChild, e[i].children[0]);
+    } else {
+        for (let i = 0, e; i < (e = $(".existing.segment")).length; i++) {
+            if (e[i].children[0].localName != "pre") continue;
+            if (/\/problem\//.test(domain) && e[i].parentNode.style.overflow != "hidden") e[i].parentNode.style.width = "50%";
+            e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
+                                 ${qaq}</div>`;
+            addCopy(e[i].lastChild, e[i].children[0]);
         }
     }
 }
@@ -455,18 +457,6 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
             arr[i].innerHTML = arr[i].innerHTML.slice(0, pos) + name[i] + arr[i].innerHTML.slice(pos);
         }
     }
-    if (head.innerHTML.indexOf("nick") == -1) {
-        let arr = document.getElementsByTagName("tbody")[0].rows;
-        let name = await Promise.all(Array.from({length: arr.length}, (v, i) => i).map(async (i) => {
-            return `<td>${await getNick(arr[i].innerHTML.match(USERNAME)[0])}</td>`;
-        }));
-        pos = head.innerHTML.search(/用户名[\s\S]*?<\/th>/) + 10;
-        head.innerHTML = head.innerHTML.slice(0, pos) + "<th>nick</th>" + head.innerHTML.slice(pos);
-        for (let i = 0; i < arr.length; ++i) {
-            let pos = /ranklist/.test(domain) ? arr[i].innerHTML.search("</a></td>") : 0;
-            arr[i].innerHTML = arr[i].innerHTML.slice(0, pos) + name[i] + arr[i].innerHTML.slice(pos);
-        }
-    }
     if (/ranklist/.test(domain)) {
         $(".padding")[0].innerHTML =
               `<span class="ui mini right floated labeled blue icon button" id="rating" style="top:6px;"><i class="calculator icon" id=calc></i>Predict Rating</span>`
@@ -485,7 +475,7 @@ if (/user\/\d+\/edit/.test(domain)) {
         if ($(q).html().includes('个性签名'))
             intro = q.children[0].children[1];
     if (intro.children[0] != null) intro = intro.children[0];
-    $('.field')[5].after($(`<div class="field">
+    $('.field')[4].after($(`<div class="field">
       <label for="information">个性签名（技术原因无法获取签名源码）</label>
       <textarea class="markdown-edit" rows="5" id="information" name="information">${intro.innerHTML}</textarea>
     </div>`)[0]);
@@ -544,4 +534,21 @@ if (domain == "/") {
         loginCookie(prompt("Cookie:", ""));
         window.location.reload();
     });
+    $('#meow').click(() => {
+        console.log('qwq');
+        localStorage.setItem("meow_meow_meow", $('#meow').prop('checked') ? "Y" : "N");
+        window.location.reload();
+    })
+}
+if (fool) {
+    try {
+        $('a.header')[0].innerHTML = `<img src="https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif" />`;
+    } catch {
+        console.log('/yiw');
+    }
+    if (/submission/.test(domain))
+        for (let meow of $('i')) {
+            if (/checkmark|remove|bomb|ban|clock|microchip|print|file outline|hourglass half|code|server|folder open outline|minus|question circle/.test(meow.className))
+                meow.outerHTML = foolimg;
+        }
 }
