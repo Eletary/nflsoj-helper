@@ -305,7 +305,7 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
     }, 0);
 }
 /******************** BZOJ module ********************/
-if (/problem/.test(domain)) {
+if (/problem(?!s)/.test(domain)) {
     let value = $(".ui.grid")[1];
     if (value.children[1].children[0].children[1].innerText == "题目描述") {
         let bzoj = (await getDOM(value.children[1].getElementsByTagName("a")[0].href)).getElementsByClassName("ui grid")[1];
@@ -551,7 +551,10 @@ if (fool) {
     }
     if (/submission/.test(domain))
         for (let meow of $('i')) {
-            if (/checkmark|remove|bomb|ban|clock|microchip|print|file outline|hourglass half|code|server|folder open outline|minus|question circle/.test(meow.className))
+
+            if (/checkmark|bomb|ban|clock|microchip|print|file outline|hourglass half|code|server|folder open outline|minus|question circle|spinner/.test(meow.className))
                 meow.outerHTML = foolimg;
+            if (/retweet/.test(meow.className)) meow.outerHTML = `<img style="width:240px;height:290px;" src = ${bigfool} />`;
+            if (/remove/.test(meow.className)) meow.outerHTML = `<img style="width:24px;height:29px;transform:rotate(180deg)" src='${bigfool}' />`
         }
 }
