@@ -19,7 +19,7 @@
 /* eslint-disable curly */
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", USERNAME = /\/user\/\d+/,
-      fool = (localStorage.getItem("meow_meow_meow") != 'N'), foolimg = '<img src="https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif" style="width:24px;height:29px;" />', bigfool = 'https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif';
+      fool = (localStorage.getItem("meow_meow_meow") == 'Y'), foolimg = '<img src="https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif" style="width:24px;height:29px;" />', bigfool = 'https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif';
 /******************** login module ********************/
 function loginCookie(cookie) {
     console.log(cookie);
@@ -136,7 +136,7 @@ if (domain == "/") {
     <p>版本：v${GM_info.script.version}</p><p>作者：${GM_info.script.author}</p>
     ${foolimg}
     <span class="ui toggle checkbox" style="position:relative;left:10px;">
-      <input id="meow" type="checkbox" ${localStorage.getItem("meow_meow_meow") == "N" ? "" : "checked"}>
+      <input id="meow" type="checkbox" ${localStorage.getItem("meow_meow_meow") != "Y" ? "" : "checked"}>
       <label>  </label>
     </span>`);
 }
@@ -153,10 +153,6 @@ function versionCompare(sources, dests) {
         if (preNum != lastNum) return preNum > lastNum;
     }
     return false;
-}
-if (localStorage.getItem("show_changelog") != null) {
-    $(promptContent("更新日志", localStorage.getItem("show_changelog"))).modal('show');
-    localStorage.removeItem("show_changelog");
 }
 async function updateScript(latest) {
     localStorage.setItem("show_changelog", await $.post("/api/v2/markdown","s=" + encodeURIComponent(`## ${latest.tag_name}\n${latest.body}`)));
@@ -539,7 +535,6 @@ if (domain == "/") {
         window.location.reload();
     });
     $('#meow').click(() => {
-        console.log('qwq');
         localStorage.setItem("meow_meow_meow", $('#meow').prop('checked') ? "Y" : "N");
         window.location.reload();
     })
@@ -558,4 +553,8 @@ if (fool) {
             if (/retweet/.test(meow.className)) meow.outerHTML = `<img style="width:240px;height:290px;" src = ${bigfool} />`;
             if (/remove/.test(meow.className)) meow.outerHTML = `<img style="width:24px;height:29px;transform:rotate(180deg)" src='${bigfool}' />`
         }
+}
+if (localStorage.getItem("show_changelog") != null) {
+    $(promptContent("更新日志", localStorage.getItem("show_changelog"))).modal('show');
+    localStorage.removeItem("show_changelog");
 }
