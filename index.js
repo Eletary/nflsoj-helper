@@ -19,7 +19,7 @@
 /* eslint-disable curly */
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", USERNAME = /\/user\/\d+/,
-      fool = (localStorage.getItem("meow_meow_meow") != 'N'), foolimg = '<img src="https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif" style="width:24px;height:29px;" />', bigfool = 'https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif'
+      fool = (localStorage.getItem("meow_meow_meow") != 'N'), foolimg = '<img src="https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif" style="width:24px;height:29px;" />', bigfool = 'https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif';
 /******************** login module ********************/
 function loginCookie(cookie) {
     console.log(cookie);
@@ -331,6 +331,7 @@ if (/problem(?!s)/.test(domain)) {
     }
 }
 /******************** copy module ********************/
+$('.ban_copy').removeClass('ban_copy');
 function addCopy(button, code) {
     button.addEventListener("click", () => {
         GM_setClipboard(code.textContent.replaceAll("\n", "\r\n"), "Copy"); // eslint-disable-line no-undef
