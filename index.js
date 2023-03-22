@@ -19,12 +19,23 @@
 /* eslint-disable curly */
 
 const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", USERNAME = /\/user\/\d+/,
-      fool = (localStorage.getItem("meow_meow_meow") == 'Y'), foolimg = '<img src="https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif" style="width:24px;height:29px;" />', bigfool = 'https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif';
+      fool = (localStorage.getItem("meow_meow_meow") == 'Y'), bigfool = 'https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif', foolimg = `<img src="${bigfool}" style="width:24px;height:29px;" />`;
 /******************** login module ********************/
 function loginCookie(cookie) {
     console.log(cookie);
     document.cookie = 'login=' + cookie + ';expires=Wed, 04 Aug 2077 01:00:00 GMT';
     document.cookie = 'connect.sid=;';
+}
+if (domain == "/help" && window.location.href.includes('10611')) {
+    $("body")[0].style='';
+    $("body").html(`
+    <iframe id="ifi"
+      title="Inline Frame Example"
+      width=100%
+      height=100%
+      src="http://www.nfls.com.cn:20035/help">
+    </iframe>
+  `);
 }
 if (domain == "/login") {
     $(document).ready(() => {
@@ -302,6 +313,7 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
 }
 /******************** BZOJ module ********************/
 if (/problem(?!s)/.test(domain)) {
+    $($("script")[16]).remove();
     let value = $(".ui.grid")[1];
     if (value.children[1].children[0].children[1].innerText == "题目描述") {
         let bzoj = (await getDOM(value.children[1].getElementsByTagName("a")[0].href)).getElementsByClassName("ui grid")[1];
@@ -317,13 +329,9 @@ if (/problem(?!s)/.test(domain)) {
             if (q.innerHTML.includes('数据范围') || q.innerHTML.includes('C++'))
                 p += q.outerHTML;
         $(value).html(p);
-        try {
-            let script = document.createElement("script");
-            script.innerText = document.getElementsByTagName("script")[16].innerText;
-            document.body.appendChild(script);
-        } catch {
-            console.log("No need to load code editor.");
-        }
+        let script = document.createElement("script");
+        script.innerHTML = `eval($("script[type='text/javascript']:last").text())`;
+        document.body.appendChild(script);
     }
 }
 /******************** copy module ********************/
@@ -475,10 +483,20 @@ if (/user\/\d+\/edit/.test(domain)) {
         if ($(q).html().includes('个性签名'))
             intro = q.children[0].children[1];
     if (intro.children[0] != null) intro = intro.children[0];
-    $('.field')[4].after($(`<div class="field">
+    $('.field')[3].after($(`<div class="field">
       <label for="information">个性签名（技术原因无法获取签名源码）</label>
       <textarea class="markdown-edit" rows="5" id="information" name="information">${intro.innerHTML}</textarea>
     </div>`)[0]);
+}
+/******************** submission module ********************/
+if (/\/practice\/\d+\/problem\/\d+/.test(domain)) {
+    $('#submit_code').submit(() => setTimeout(() => {
+        console.log('submitted');
+        let script = document.createElement("script");
+        script.innerHTML = '__showList()';
+        document.body.appendChild(script);
+        setTimeout(() => {if (!$('#ListType')[0].checked) $('#ListType').click();},100);
+    },100));
 }
 /******************** dashboard ********************/
 if (domain == "/") {
