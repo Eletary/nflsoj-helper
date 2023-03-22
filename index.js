@@ -496,7 +496,7 @@ if (/\/practice\/\d+\/problem\/\d+/.test(domain)) {
         script.innerHTML = '__showList()';
         document.body.appendChild(script);
         setTimeout(() => {if (!$('#ListType')[0].checked) $('#ListType').click();},100);
-    },100));
+    },1000));
 }
 /******************** dashboard ********************/
 if (domain == "/") {
