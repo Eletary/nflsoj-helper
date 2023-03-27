@@ -26,17 +26,6 @@ function loginCookie(cookie) {
     document.cookie = 'login=' + cookie + ';expires=Wed, 04 Aug 2077 01:00:00 GMT';
     document.cookie = 'connect.sid=;';
 }
-if (domain == "/help" && window.location.href.includes('10611')) {
-    $("body")[0].style='';
-    $("body").html(`
-    <iframe id="ifi"
-      title="Inline Frame Example"
-      width=100%
-      height=100%
-      src="http://www.nfls.com.cn:20035/help">
-    </iframe>
-  `);
-}
 if (domain == "/login") {
     $(document).ready(() => {
         let script = document.createElement('script');
@@ -149,7 +138,7 @@ if (domain == "/") {
     <span class="ui toggle checkbox" style="position:relative;left:10px;">
       <input id="meow" type="checkbox" ${localStorage.getItem("meow_meow_meow") != "Y" ? "" : "checked"}>
       <label>  </label>
-    </span>`);
+    </span>`); // eslint-disable-line no-undef
 }
 /******************** subscribe module ********************/
 function versionCompare(sources, dests) {
@@ -263,8 +252,8 @@ if (domain == "/") {
     mian.appendChild(script);
 }
 /******************** style module ********************/
-(/contests|practices|statistics|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0] :
-/cp/.test(domain) ? $(".fixed-table-body")[0] : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
+(/contests|practices|statistics|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0]
+: document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
 if (String(localStorage.getItem("bgurl")) != "null" && document.getElementsByTagName("span")[0].id != 'submission_content') {
     document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
 }
@@ -440,7 +429,6 @@ async function Rating() {
     const hisRating = $(".center.aligned.header")[0].innerText.replaceAll("(", "\\(").replaceAll(")", "\\)") + `<\\/td>[\\s\\S]*?(<td>\\d{3,4}[^/]*?<\\/td>)`,
           curRating = /<i class="star icon"><\/i>积分 (\d+)/;
     let arr = document.getElementsByTagName("tbody")[0].rows, c = Array.from({length: arr.length}, (v, i) => i);
-    console.log(arr[0].innerHTML.match(USERNAME)[0], hisRating);
     c = (await $.get(arr[0].innerHTML.match(USERNAME)[0])).match(hisRating) != null
         ? await Promise.all(c.map(async i => (await $.get(arr[i].innerHTML.match(USERNAME)[0])).match(hisRating)[1]))
         : calcRating(await Promise.all(c.map(async i => ({
@@ -453,8 +441,8 @@ async function Rating() {
 /******************** rank module ********************/
 if (/\d+\/(ranklist|repeat)/.test(domain)) {
     let head = document.getElementsByTagName("tr")[0], pos = /ranklist/.test(domain) ? head.innerHTML.indexOf("</th>") + 5 : 0;
+    let arr = document.getElementsByTagName("tbody")[0].rows;
     if (head.innerHTML.indexOf("用户名") == -1) {
-        let arr = document.getElementsByTagName("tbody")[0].rows;
         let name = await Promise.all(Array.from({length: arr.length}, (v, i) => i).map(async (i) => {
             let raw = await $.get(arr[i].innerHTML.match(/\/submission\/\d+/)[0]);
             return `<td><a href="/user/${raw.match(/"userId":(\d+)/)[1]}">${raw.match(/"user":"([\s\S]+?)"/)[1]}</a></td>`;
@@ -496,7 +484,7 @@ if (/\/practice\/\d+\/problem\/\d+/.test(domain)) {
         script.innerHTML = '__showList()';
         document.body.appendChild(script);
         setTimeout(() => {if (!$('#ListType')[0].checked) $('#ListType').click();},100);
-    },1000));
+    },500));
 }
 /******************** dashboard ********************/
 if (domain == "/") {
