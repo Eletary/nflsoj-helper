@@ -26,6 +26,19 @@ function loginCookie(cookie) {
     document.cookie = 'login=' + cookie + ';expires=Wed, 04 Aug 2077 01:00:00 GMT';
     document.cookie = 'connect.sid=;';
 }
+/*
+if (domain == "/help" && window.location.href.includes('10611')) {
+    $("body")[0].style='';
+    $("body").html(`
+    <iframe id="ifi"
+      title="Inline Frame Example"
+      width=100%
+      height=100%
+      src="http://www.nfls.com.cn:20035/help">
+    </iframe>
+  `);
+}
+*/
 if (domain == "/login") {
     $(document).ready(() => {
         let script = document.createElement('script');
@@ -204,7 +217,7 @@ function genSearchBox(use, id, holder, api) {
 }
 async function hitokoto() {
     let h = await $.get("https://v1.hitokoto.cn/?c=a");
-    return `${h.hitokoto}<div style="margin-top: 14px;text-align: right;font-size: .95em;color: #999;">${"\u2014\u2014"}${h.from}</div>`;
+    return `<a style='color:black' href=https://hitokoto.cn/?uuid=${h.uuid} target='_blank'>${h.hitokoto}</a><div style="margin-top: 14px;text-align: right;font-size: .95em;color: #999;">${"\u2014\u2014"}${h.from}</div>`;
 }
 if (domain == "/") {
     document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
