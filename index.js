@@ -185,8 +185,15 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
 }
 /******************** contest module ********************/
 try {
-    let username = $(".dropdown.item")[1].children[0].innerText.slice(0, -1);
-    if ($("body").html().includes("我的比赛")) $(".menu")[1].innerHTML += `<a class="item" href="/summary/?username=${username}"><i class="tasks icon"></i>总结</a>`;
+    let username = $(".dropdown.item")[0].children[0].innerText.slice(0, -1);
+    $(".menu:first").find("a")[3].outerHTML=`<div class="item" style="padding: 0px;">
+                <div class="ui simple dropdown item">
+                  <a href="/contests" style="color: inherit; --darkreader-inline-color: inherit;" data-darkreader-inline-color=""><i class="calendar icon"></i> 比赛 <i class="dropdown icon" style="margin: 0px;"></i></a>
+                  <div class="menu">
+                    <a class="item" href="/cp${$(".menu:first").find("a")[9].href.match(USERNAME)[0]}"><i class="list icon"></i>我的比赛</a>
+                  <a class="item" href="/summary/?username=${username}"><i class="tasks icon"></i>总结</a></div>
+                </div>
+              </div>`
     if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
 } catch {
     console.info('iframe');
@@ -317,7 +324,7 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
 if (/problem(?!s)/.test(domain)) {
     $($("script")[16]).remove();
     let value = $(".ui.grid")[1];
-    if (value.children[1].children[0].children[1].innerText == "题目描述") {
+    if (value.children[1].children[0].children[1].innerText.includes("题目描述")) {
         let bzoj = (await getDOM(value.children[1].getElementsByTagName("a")[0].href)).getElementsByClassName("ui grid")[1];
         bzoj.innerHTML = bzoj.innerHTML.replaceAll("upload/", "/bzoj/JudgeOnline/upload/").replaceAll("images/", "/bzoj/JudgeOnline/images/");
         bzoj = bzoj.children;
@@ -484,7 +491,7 @@ if (/user\/\d+\/edit/.test(domain)) {
         if ($(q).html().includes('个性签名'))
             intro = q.children[0].children[1];
     if (intro.children[0] != null) intro = intro.children[0];
-    $('.field')[3].after($(`<div class="field">
+    $('.field')[5].after($(`<div class="field">
       <label for="information">个性签名（技术原因无法获取签名源码）</label>
       <textarea class="markdown-edit" rows="5" id="information" name="information">${intro.innerHTML}</textarea>
     </div>`)[0]);
