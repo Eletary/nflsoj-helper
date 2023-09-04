@@ -18,7 +18,7 @@
 /* global $, md5 */
 /* eslint-disable curly */
 
-const domain = window.location.pathname, repo = "NFLSCode/nflsoj-helper", USERNAME = /\/user\/\d+/,
+const domain = window.location.pathname, repo = "Eletary/nflsoj-helper", USERNAME = /\/user\/\d+/,
       fool = (localStorage.getItem("meow_meow_meow") == 'Y'), bigfool = 'https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif', foolimg = `<img src="${bigfool}" style="width:24px;height:29px;" />`;
 /******************** login module ********************/
 function loginCookie(cookie) {
