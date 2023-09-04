@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         NFLSOJ Helper
-// @namespace    https://github.com/NFLSCode/nflsoj-helper
+// @namespace    https://github.com/Eletary/nflsoj-helper
 // @version      dev
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
@@ -12,8 +12,8 @@
 // @require      http://www.nfls.com.cn:20035/cdnjs/semantic-ui/2.4.1/semantic.min.js
 // @grant        GM_setClipboard
 // @grant        GM_info
-// @icon         https://cdn.jsdelivr.net/gh/NFLSCode/nflsoj-helper@master/images/icon.png
-// @icon64       https://cdn.jsdelivr.net/gh/NFLSCode/nflsoj-helper@master/images/icon.png
+// @icon         https://cdn.jsdelivr.net/gh/Eletary/nflsoj-helper@master/images/icon.png
+// @icon64       https://cdn.jsdelivr.net/gh/Eletary/nflsoj-helper@master/images/icon.png
 // ==/UserScript==
 /* global $, md5 */
 /* eslint-disable curly */
