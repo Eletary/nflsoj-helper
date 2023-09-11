@@ -22,7 +22,7 @@ const domain = window.location.pathname, repo = "Eletary/nflsoj-helper", USERNAM
       fool = (localStorage.getItem("meow_meow_meow") == 'Y'), bigfool = 'https://s2.loli.net/2023/03/14/HrTUvndYtm3aceL.gif', foolimg = `<img src="${bigfool}" style="width:24px;height:29px;" />`;
 /******************** login module ********************/
 function loginCookie(cookie) {
-    console.log(cookie);
+    // console.log(cookie);
     document.cookie = 'login=' + cookie + ';expires=Wed, 04 Aug 2077 01:00:00 GMT';
     document.cookie = 'connect.sid=;';
 }
@@ -45,7 +45,6 @@ if (domain == "/login") {
         script.innerHTML = "login = () => {}";
         document.body.appendChild(script);
         let hack = () => {
-            console.log('ewe');
             let show_error = (error) => {$("#error").text(error);$("#error").show();}
             let username = $("#username").val(), password = md5($("#password").val() + "syzoj2_xxx");
             $("#login").addClass("loading");
@@ -184,20 +183,22 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
     }
 }
 /******************** contest module ********************/
-try {
-    let username = $(".dropdown.item")[0].children[0].innerText.slice(0, -1);
-    $(".menu:first").find("a")[3].outerHTML=`<div class="item" style="padding: 0px;">
+let username = $(".dropdown.item")[0].children[0].innerText.slice(0, -1);
+for (let i = 9; i <= 10; ++i) {
+    try {
+        $(".menu:first").find("a")[3].outerHTML=`<div class="item" style="padding: 0px;">
                 <div class="ui simple dropdown item">
                   <a href="/contests" style="color: inherit; --darkreader-inline-color: inherit;" data-darkreader-inline-color=""><i class="calendar icon"></i> 比赛 <i class="dropdown icon" style="margin: 0px;"></i></a>
                   <div class="menu">
-                    <a class="item" href="/cp${$(".menu:first").find("a")[9].href.match(USERNAME)[0]}"><i class="list icon"></i>我的比赛</a>
+                    <a class="item" href="/cp${$(".menu:first").find("a")[i].href.match(USERNAME)[0]}"><i class="list icon"></i>我的比赛</a>
                   <a class="item" href="/summary/?username=${username}"><i class="tasks icon"></i>总结</a></div>
                 </div>
               </div>`
-    if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
-} catch {
-    console.info('iframe');
+    } catch(e) {
+        console.error(e);
+    }
 }
+if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
 async function getDOM(href) {
     return new DOMParser().parseFromString(await $.get(href), "text/html");
 }
@@ -272,6 +273,12 @@ if (domain == "/") {
     mian.appendChild(script);
 }
 /******************** style module ********************/
+let o = document.createElement("style");
+o.innerHTML = `
+pre {
+  font-family: "Fira Code" !important
+}`;
+document.head.append(o);
 (/contests|practices|statistics|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0]
 : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
 if (String(localStorage.getItem("bgurl")) != "null" && document.getElementsByTagName("span")[0].id != 'submission_content') {
@@ -324,23 +331,27 @@ if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
 if (/problem(?!s)/.test(domain)) {
     $($("script")[16]).remove();
     let value = $(".ui.grid")[1];
-    if (value.children[1].children[0].children[1].innerText.includes("题目描述")) {
-        let bzoj = (await getDOM(value.children[1].getElementsByTagName("a")[0].href)).getElementsByClassName("ui grid")[1];
-        bzoj.innerHTML = bzoj.innerHTML.replaceAll("upload/", "/bzoj/JudgeOnline/upload/").replaceAll("images/", "/bzoj/JudgeOnline/images/");
-        bzoj = bzoj.children;
-        let p = "";
-        for (let q of [0,1])
-            p += value.children[q].outerHTML;
-        for (let i = 1; i < bzoj.length; ++i)
-            if (!/^\s*$/.test(bzoj[i].children[0].children[1].innerText) || /img/.test(bzoj[i].innerHTML))
-                p += bzoj[i].outerHTML;
-        for (let q of value.children)
-            if (q.innerHTML.includes('数据范围') || q.innerHTML.includes('C++'))
-                p += q.outerHTML;
-        $(value).html(p);
-        let script = document.createElement("script");
-        script.innerHTML = `eval($("script[type='text/javascript']:last").text())`;
-        document.body.appendChild(script);
+    try {
+        if (value.children[1].children[0].children[1].innerText("题目描述")) {
+            let bzoj = (await getDOM(value.children[1].getElementsByTagName("a")[0].href)).getElementsByClassName("ui grid")[1];
+            bzoj.innerHTML = bzoj.innerHTML.replaceAll("upload/", "/bzoj/JudgeOnline/upload/").replaceAll("images/", "/bzoj/JudgeOnline/images/");
+            bzoj = bzoj.children;
+            let p = "";
+            for (let q of [0,1])
+                p += value.children[q].outerHTML;
+            for (let i = 1; i < bzoj.length; ++i)
+                if (!/^\s*$/.test(bzoj[i].children[0].children[1].innerText) || /img/.test(bzoj[i].innerHTML))
+                    p += bzoj[i].outerHTML;
+            for (let q of value.children)
+                if (q.innerHTML.includes('数据范围') || q.innerHTML.includes('C++'))
+                    p += q.outerHTML;
+            $(value).html(p);
+            let script = document.createElement("script");
+            script.innerHTML = `eval($("script[type='text/javascript']:last").text())`;
+            document.body.appendChild(script);
+        }
+    } catch {
+        console.info("Not a BZOJ problem");
     }
 }
 /******************** copy module ********************/
