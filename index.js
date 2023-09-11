@@ -146,6 +146,7 @@ let Inform;
 if (domain == "/") {
     Inform = promptContent("NFLSOJ Helper 帮助信息", `
     <p>版本：v${GM_info.script.version}</p><p>作者：${GM_info.script.author}</p>
+    <p><a href="https://github.com/Eletary/nflsoj-helper/blob/master/CHANGELOG.md" target="_blank">完整更新日志</a></p>
     ${foolimg}
     <span class="ui toggle checkbox" style="position:relative;left:10px;">
       <input id="meow" type="checkbox" ${localStorage.getItem("meow_meow_meow") != "Y" ? "" : "checked"}>
@@ -276,7 +277,7 @@ if (domain == "/") {
 let o = document.createElement("style");
 o.innerHTML = `
 pre {
-  font-family: "Fira Code" !important
+  font-family: "Fira Code","Fira Mono","Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace !important
 }`;
 document.head.append(o);
 (/contests|practices|statistics|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0]
