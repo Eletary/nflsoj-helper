@@ -184,7 +184,12 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
     }
 }
 /******************** contest module ********************/
-let username = $(".dropdown.item")[0].children[0].innerText.slice(0, -1);
+let username;
+try{
+    username = $(".dropdown.item")[0].children[0].innerText.slice(0, -1);
+} catch {
+    console.info("[contest]: iframe")
+}
 for (let i = 9; i <= 10; ++i) {
     try {
         $(".menu:first").find("a")[3].outerHTML=`<div class="item" style="padding: 0px;">
@@ -196,7 +201,7 @@ for (let i = 9; i <= 10; ++i) {
                 </div>
               </div>`
     } catch(e) {
-        console.error(e);
+        console.log("[contest]: find failed, try again");
     }
 }
 if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
@@ -352,7 +357,7 @@ if (/problem(?!s)/.test(domain)) {
             document.body.appendChild(script);
         }
     } catch {
-        console.info("Not a BZOJ problem");
+        console.info("[BZOJ] Not a BZOJ problem");
     }
 }
 /******************** copy module ********************/
