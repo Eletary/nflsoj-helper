@@ -40,6 +40,7 @@ if (domain == "/help" && window.location.href.includes('10611')) {
 }
 */
 if (domain == "/login") {
+    $('#login').html('启动！');
     $(document).ready(() => {
         let script = document.createElement('script');
         script.innerHTML = "login = () => {}";
@@ -201,7 +202,7 @@ for (let i = 9; i <= 10; ++i) {
                 </div>
               </div>`
     } catch(e) {
-        console.log("[contest]: find failed, try again");
+        console.log("[contest]: find top bar failed, try again");
     }
 }
 if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
@@ -211,7 +212,7 @@ async function getDOM(href) {
 /******************** rightcol module ********************/
 function genSearchBox(use, id, holder, api) {
     return [`
-    <h4 class="ui top attached block header"><i class="search icon"></i>${use}</h4>
+    <h4 class="ui top attached block header"><i class="search icon"></i><div class="content">${use}</div></h4>
     <div class="ui bottom attached segment">
       <div class="ui search focus" id="${id}" style="width: 100%; ">
         <div class="ui left icon input" style="width: 100%; ">
@@ -222,7 +223,7 @@ function genSearchBox(use, id, holder, api) {
     </div></div>`, `
     $(function () {
       $('#${id}').search({
-        debug: true,
+        debug: false,
         apiSettings: {url: '/api/v2/search/${api}/{query}', cache: false},
         fields: {title: 'name'}
       });
@@ -243,7 +244,7 @@ if (domain == "/") {
     script.innerHTML = search1[1];
     try {
         mian.innerHTML = `
-        <h4 class="ui block top attached header"><i aria-hidden="true" class="comment alternate icon"></i><div class="content">Hitokoto (ヒトコト)
+        <h4 class="ui block top attached header"><i aria-hidden="true" class="ui quote left icon"></i><div class="content">Hitokoto (ヒトコト)
           <i id="hit" title="Refresh" style="" class="redo icon button"></i></div></h4>
         <div class="ui bottom attached center aligned segment">
           <div id="hitword"></div>
@@ -285,8 +286,12 @@ pre {
   font-family: "Fira Code","Fira Mono","Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace !important
 }`;
 document.head.append(o);
-(/contests|practices|statistics|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0]
-: document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
+try {
+    (/contests|practices|statistics|submissions|\d+\/ranklist|repeat|discussion/.test(domain) ? $(".ui.very.basic.center.aligned.table")[0]
+     : document.createElement("text")).style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
+} catch {
+    document.createElement("text").style.cssText += "background-color:#fff;padding:14px;border:thin solid rgba(200,200,200,.5)";
+}
 if (String(localStorage.getItem("bgurl")) != "null" && document.getElementsByTagName("span")[0].id != 'submission_content') {
     document.body.style.backgroundImage = `url(${localStorage.getItem("bgurl")})`;
 }
