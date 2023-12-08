@@ -26,19 +26,6 @@ function loginCookie(cookie) {
     document.cookie = 'login=' + cookie + ';expires=Wed, 04 Aug 2077 01:00:00 GMT';
     document.cookie = 'connect.sid=;';
 }
-/*
-if (domain == "/help" && window.location.href.includes('10611')) {
-    $("body")[0].style='';
-    $("body").html(`
-    <iframe id="ifi"
-      title="Inline Frame Example"
-      width=100%
-      height=100%
-      src="http://www.nfls.com.cn:20035/help">
-    </iframe>
-  `);
-}
-*/
 if (domain == "/login") {
     $('#login').html('启动！');
     $(document).ready(() => {
@@ -403,11 +390,11 @@ if (!(/login/.test(domain))) {
         value.children[0].children[1].addEventListener("click", formatCode);
     } else {
         for (let i = 0, e; i < (e = $(".existing.segment")).length; i++) {
-            if (e[i].children[0].localName != "pre") continue;
+            if ($(e[i]).children('pre').length == 0) continue;
             if (/\/problem\//.test(domain) && e[i].parentNode.style.overflow != "hidden") e[i].parentNode.style.width = "50%";
             e[i].innerHTML += `<div class="ui button" style="position:absolute;top:0px;right:-4px;border-top-left-radius:0;border-bottom-right-radius:0;">
                                  ${qaq}</div>`;
-            addCopy(e[i].lastChild, e[i].children[0]);
+            addCopy(e[i].lastChild, $(e[i]).children('pre')[0]);
         }
     }
 }
