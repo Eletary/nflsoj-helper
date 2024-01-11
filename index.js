@@ -5,6 +5,7 @@
 // @description  Use NFLSOJ More Easily
 // @author       lexiyvv & ppip & GlaceonVGC & ACrazySteve
 // @match        *://www.nfls.com.cn:20035/*
+// @match        *://www.nfls.com.cn:10611/*
 // @match        *://192.168.188.77/*
 // @match        *://192.168.188.88/*
 // @require      http://www.nfls.com.cn:20035/cdnjs/jquery/3.3.1/jquery.min.js
@@ -207,28 +208,29 @@ function genSearchBox(use, id, holder, api) {
           <i class="search icon"></i>
         </div>
         <div class="results" style="width: 100%; "></div>
-    </div></div>`, `
-    $(function () {
-      $('#${id}').search({
+    </div></div>`,
+    function () {
+      $(`#${id}`).search({
         debug: false,
-        apiSettings: {url: '/api/v2/search/${api}/{query}', cache: false},
+        apiSettings: {url: `/api/v2/search/${api}/{query}`, cache: false},
         fields: {title: 'name'}
       });
-    });
-    `];
+    }
+    ];
 }
 async function hitokoto() {
     let h = await $.get("https://v1.hitokoto.cn/?c=a");
     return `<a style='color:black' href=https://hitokoto.cn/?uuid=${h.uuid} target='_blank'>${h.hitokoto}</a><div style="margin-top: 14px;text-align: right;font-size: .95em;color: #999;">${"\u2014\u2014"}${h.from}</div>`;
 }
 if (domain == "/") {
-    document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
+    let rank = $(".ui.very.basic.center.aligned.table")[0];
+    rank.innerHTML = rank.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
     let mian = $(".right.floated.five.wide.column")[0];
-    let search1 = genSearchBox("查找用户", "user", "ID / 用户名 …", "users");
-    mian.children[0].remove();mian.children[0].remove();
-    mian.innerHTML = search1[0] + mian.innerHTML;
-    let script = document.createElement("script");
-    script.innerHTML = search1[1];
+    let search1 = genSearchBox("搜索题目", "problems", "ID / 题目名 …", "problems");
+    let search2 = genSearchBox("查找用户", "user", "ID / 用户名 …", "users");
+    mian.innerHTML = search1[0] + search2[0] + mian.innerHTML;
+    $(search1[1]);
+    $(search2[1]);
     try {
         mian.innerHTML = `
         <h4 class="ui block top attached header"><i aria-hidden="true" class="ui quote left icon"></i><div class="content">Hitokoto (ヒトコト)
