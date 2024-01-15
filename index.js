@@ -266,7 +266,6 @@ if (domain == "/") {
     } catch {
         console.error("rightcol.hitokoto: require network connection");
     }
-    mian.appendChild(script);
 }
 /******************** style module ********************/
 let o = document.createElement("style");
