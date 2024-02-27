@@ -132,6 +132,10 @@ function promptContent(title, content) {
     return '#' + id;
 }
 let Inform;
+function getRate() {
+    let rate = localStorage.getItem('unknown_rate');
+    return rate == null ? 0.01 : parseFloat(rate);
+}
 if (domain == "/") {
     Inform = promptContent("NFLSOJ Helper 帮助信息", `
     <p>版本：v${GM_info.script.version}</p><p>作者：${GM_info.script.author}</p>
@@ -140,7 +144,12 @@ if (domain == "/") {
     <span class="ui toggle checkbox" style="position:relative;left:10px;">
       <input id="meow" type="checkbox" ${localStorage.getItem("meow_meow_meow") != "Y" ? "" : "checked"}>
       <label>  </label>
-    </span>`); // eslint-disable-line no-undef
+    </span>
+    <br>
+    <span class="status unknown" id='qwq'><i class="icon question circle"></i>
+      概率：${getRate()}
+    </span>
+    `); // eslint-disable-line no-undef
 }
 /******************** subscribe module ********************/
 function versionCompare(sources, dests) {
@@ -193,7 +202,12 @@ for (let i = 9; i <= 10; ++i) {
         console.log("[contest]: find top bar failed, try again");
     }
 }
-if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) document.body.innerHTML = document.body.innerHTML.replaceAll("<!--", "").replaceAll("-->", "");
+if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) {
+    try {
+        let sparkle = $($('.row')[1]);
+        sparkle.html(sparkle.html().replaceAll("<!--", "").replaceAll("-->", ""));
+    } catch(e) {}
+}
 async function getDOM(href) {
     return new DOMParser().parseFromString(await $.get(href), "text/html");
 }
@@ -208,15 +222,15 @@ function genSearchBox(use, id, holder, api) {
           <i class="search icon"></i>
         </div>
         <div class="results" style="width: 100%; "></div>
-    </div></div>`,
-    function () {
-      $(`#${id}`).search({
+    </div></div>`, `
+    $(function () {
+      $('#${id}').search({
         debug: false,
-        apiSettings: {url: `/api/v2/search/${api}/{query}`, cache: false},
+        apiSettings: {url: '/api/v2/search/${api}/{query}', cache: false},
         fields: {title: 'name'}
       });
-    }
-    ];
+    });
+    `];
 }
 async function hitokoto() {
     let h = await $.get("https://v1.hitokoto.cn/?c=a");
@@ -369,7 +383,7 @@ let clickCountForCode = 0;
 function formatCode() {
     clickCountForCode ^= 1;
     let value = $(".existing.segment")[0];
-    value.children[1].firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode; // eslint-disable-line no-undef
+    value.lastChild.firstChild.innerHTML = clickCountForCode ? formattedCode : unformattedCode; // eslint-disable-line no-undef
     value.children[0].children[1].textContent = clickCountForCode ? "显示原始代码" : "格式化代码";
 }
 if (!(/login/.test(domain))) {
@@ -377,7 +391,7 @@ if (!(/login/.test(domain))) {
     if (fool) {
         qaq = foolimg;
     }
-    if (/\/submission\/\d+/.test(domain) && document.body.innerText.includes("格式化代码")) {
+    if (/\/submission\/\d+/.test(domain) && document.body.innerText.includes("格式化代码") || document.body.innerText.includes("显示原始代码")) {
         let value = $(".existing.segment")[0];
         value.firstChild.style.borderRadius = "0 .28571429rem 0 0";
         value.firstChild.style.position = "unset";
@@ -573,7 +587,19 @@ if (domain == "/") {
     $('#meow').click(() => {
         localStorage.setItem("meow_meow_meow", $('#meow').prop('checked') ? "Y" : "N");
         window.location.reload();
-    })
+    });
+    $('#qwq').click(() => {
+        let ans = prompt("请填写概率（0 到 1 之间）：","0.01");
+        try {
+            ans = parseFloat(ans);
+            if (ans < 0 || ans > 1) throw "out of range";
+        } catch(e) {
+            alert("Error: " + e);
+            return;
+        }
+        localStorage.setItem("unknown_rate", ans);
+        window.location.reload();
+    });
 }
 if (fool) {
     try {
@@ -589,6 +615,15 @@ if (fool) {
             if (/retweet/.test(meow.className)) meow.outerHTML = `<img style="width:240px;height:290px;" src = ${bigfool} />`;
             if (/remove/.test(meow.className)) meow.outerHTML = `<img style="width:24px;height:29px;transform:rotate(180deg)" src='${bigfool}' />`
         }
+} else {
+    try {
+        if (Math.random() <= getRate()) $('a.header')[0].innerHTML = `
+            <span class="status unknown" style="font-size: 1.5em; font-weight: 600; "><i class="icon question circle"></i>Unknown</span>
+            <span style="font-family: 'Exo 2'; font-size: 1.5em; font-weight: 600; padding-left: 2px">OJ</span>`;
+    } catch {
+        console.log('Unknown /qd');
+    }
+
 }
 if (localStorage.getItem("show_changelog") != null) {
     $(promptContent("更新日志", localStorage.getItem("show_changelog"))).modal('show');
