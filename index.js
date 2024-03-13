@@ -181,6 +181,19 @@ if (domain == "/" && localStorage.getItem("disable_auto_update") != "Y") {
         }, 0);
     }
 }
+/******************** hack module ********************/
+function get_key(problem_id) {
+  return md5(problem_id + "problem_xxx")
+}
+if (/^\/problem\/\d+($|\/(?![\d\w]))/.test(domain) && !$("body").html().includes("提交记录") && $("body").html().includes("您没有权限进行此操作。")) {
+    window.location.href = domain + '?key=' + get_key(domain.match(/\d+/)[0]);
+}
+try {
+    let qwq = $("body").html().match(/\/streams\/([\s\S]*?)\/index.m3u8/);
+    console.log(`ffmpeg -headers "Cookie: Cookie: __jsluid_h=e3c5a92e1355327b9df53e0a0a252fcb; login=%5B%22ppip%22%2C%22631d0ef11e4f2541c26b19c50ffc5ded%22%5D; connect.sid=s%3AYbSqKKv9VEp4U3AN7GwuYij2v2W2vD20.f9rq3vwP6O9IFrhqLwqIESw2ereGUdLOTK54PCeZaIk; io=p9xFb4aICSjQWbDBAAE2
+" -i ${window.location.origin + qwq[0]} -c copy -bsf:a aac_adtstoasc ~/Videos/${$('h1')[0].innerText}.mp4`)
+} catch {
+}
 /******************** contest module ********************/
 let username;
 try{
@@ -210,6 +223,44 @@ if (/contest\/\d+(?!\d|\/[a-z])/.test(domain)) {
 }
 async function getDOM(href) {
     return new DOMParser().parseFromString(await $.get(href), "text/html");
+}
+if (/contest\/\d+(?!\d|\/[a-z])/.test(domain) && !$('.ui.grid').html().includes('题目')) {
+    let result = domain.match(/contest\/(\d+)/);
+    let sum = await getDOM(`/summary?username=${username}&contest_id=${result[1]}`);
+    console.log(sum);
+    let problem = '';
+    try {
+        console.log(sum.getElementsByTagName("tbody")[0].getElementsByTagName('tr')[1]);
+        for (let i = 0; ; ++i) {
+            problem += `
+            <tr><td class="center aligned" style="white-space: nowrap; ">
+            </td>
+            <td id="_td${i+1}">
+             <a href="${domain}/problem/${i+1}">
+                ${sum.getElementsByTagName("tbody")[0].getElementsByTagName('tr')[i].children[i == 0 ? 1 : 0].innerText}
+              </a>
+            </td></tr>`
+        }
+    } catch(e) {
+        console.log(e);
+    }
+    $('.ui.grid').html($('.ui.grid').html() + `
+    <div class="row">
+      <div class="column">
+        <table class="ui selectable celled table">
+          <thead>
+            <tr>
+              <th class="one wide" style="text-align: center">状态</th>
+              <th>题目</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${problem}
+          </tbody>
+        </table>
+      </div>
+    </div>
+`);
 }
 /******************** rightcol module ********************/
 function genSearchBox(use, id, holder, api) {
@@ -324,7 +375,18 @@ async function getEmail(user, size) {
             return `https://cravatar.cn/avatar/${md5(mainpage[i].innerText)}?s=${size}&d=mp`;
     return "/self/gravatar.png";
 }
+async function getNick(name, uid) {
+    return (await getDOM('/cp' + uid + '?key=' + md5(name + 'comp_xxx'))).getElementById('page_url').innerText.match(`${name} - ([\\S\\s]*)$`)[1]
+}
 if (/^\/user\/\d+(\/[^e]|$)/.test(domain)) {
+    if ($(".dropdown.item")[1].children[0].href.match(USERNAME)[0] != domain.match(USERNAME)[0])
+        $('.ui.grid').find('.row')[2].outerHTML += `
+        <div class="row">
+          <div class="column">
+            <h4 class="ui top attached block header">姓名</h4>
+            <div class="ui bottom attached segment">${await getNick($('.ui.bottom:first').text(), domain.match(USERNAME)[0])}</div>
+        </div></div>`;
+    setTimeout(() => $('#avatar_container').children(':first').click(), 0);
     let mainpage = $(".attached.segment");
     try {
         if (fool) document.getElementsByTagName("img")[0].src = bigfool;
@@ -424,6 +486,9 @@ if (!(/login/.test(domain))) {
     }
 }
 /******************** rating module ********************/
+async function getUserLink(name) {
+    return (await $.get('/api/v2/search/users/' + name)).results[0].url;
+}
 function getEloWinProbability(ra, rb) {
     return 1.0 / (1 + Math.pow(10, (rb - ra) / 400.0));
 }
@@ -506,6 +571,10 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
             let pos = /ranklist/.test(domain) ? arr[i].innerHTML.indexOf("</td>") : 0;
             arr[i].innerHTML = arr[i].innerHTML.slice(0, pos) + name[i] + arr[i].innerHTML.slice(pos);
         }
+    } else {
+        await Promise.all(Array.from({length: arr.length}, (v, i) => i).map(async (i) => {
+            arr[i].children[1].children[0].href = await getUserLink(arr[i].children[1].innerText);
+        }));
     }
     if (/ranklist/.test(domain)) {
         $(".padding")[0].innerHTML =
@@ -517,6 +586,8 @@ if (/\d+\/(ranklist|repeat)/.test(domain)) {
             $('#rating').html("<i class='calculator icon' id=calc></i>Done!");
         });
     }
+    arr = document.getElementsByTagName("tbody")[0].rows;
+    await Promise.all(Array.from({length: arr.length}, (v, i) => i).map(async (i) => {arr[i].children[1].children[0].title = await getNick(arr[i].children[1].innerText, arr[i].innerHTML.match(USERNAME)[0]);}));
 }
 /******************** settings module ********************/
 if (/user\/\d+\/edit/.test(domain)) {

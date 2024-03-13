@@ -17,6 +17,10 @@
 
 ---
 
+NFLSOJ 不再使用魔改版 SYZOJ，本项目完结。
+
+---
+
 ## Before installing
 
 This is a `give-a-star-to-use` repo. Star this repo to use.
